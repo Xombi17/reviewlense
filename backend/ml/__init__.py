@@ -10,10 +10,10 @@ All module-level functions use a lazy singleton pattern - .pkl files are
 loaded on first call only.
 """
 
-from backend.ml.loader import ModelLoader
-from backend.ml.predictor import Predictor, predict
-from backend.ml.aspects import AspectExtractor, extract_aspects
-from backend.ml.trust import TrustAnalyzer, compute_trust_score
+from .loader import ModelLoader
+from .predictor import Predictor, predict
+from .aspects import AspectExtractor, extract_aspects
+from .trust import TrustAnalyzer, compute_trust_score
 
 __all__ = [
     "ModelLoader",

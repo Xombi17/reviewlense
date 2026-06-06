@@ -6,17 +6,17 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.exceptions import (
+from exceptions import (
     APIError,
     api_error_handler,
     request_validation_error_handler,
     unhandled_exception_handler,
 )
-from backend.ml.aspects import AspectExtractor
-from backend.ml.loader import ModelLoader
-from backend.ml.predictor import Predictor
-from backend.ml.trust import TrustAnalyzer
-from backend.routes import predict, batch, stats
+from ml.aspects import AspectExtractor
+from ml.loader import ModelLoader
+from ml.predictor import Predictor
+from ml.trust import TrustAnalyzer
+from routes import predict, batch, stats
 
 
 @asynccontextmanager

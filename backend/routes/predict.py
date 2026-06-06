@@ -2,9 +2,9 @@
 
 from fastapi import APIRouter, Request
 
-from backend.exceptions import EmptyReviewError, ModelNotFoundError
-from backend.ml.preprocessing import clean_review_text
-from backend.schemas.predict import AspectSentiment, PredictRequest, PredictResponse
+from exceptions import EmptyReviewError, ModelNotFoundError
+from ml.preprocessing import clean_review_text
+from schemas.predict import AspectSentiment, PredictRequest, PredictResponse
 
 router = APIRouter()
 

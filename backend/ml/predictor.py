@@ -3,7 +3,7 @@
 import os
 from typing import Any, Dict, List
 
-from backend.ml.preprocessing import clean_review_text
+from .preprocessing import clean_review_text
 
 
 class Predictor:

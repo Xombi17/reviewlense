@@ -68,9 +68,9 @@ export default function DashboardPage() {
 
   if (!stats) return null;
 
-  const totalReviews = stats.dataset.total_reviews;
-  const positivePercentage = totalReviews > 0 ? (stats.dataset.positive_count / totalReviews) * 100 : 0;
-  const negativePercentage = totalReviews > 0 ? (stats.dataset.negative_count / totalReviews) * 100 : 0;
+  const totalReviews = stats.dataset_summary.total_reviews;
+  const positivePercentage = totalReviews > 0 ? (stats.dataset_summary.positive_count / totalReviews) * 100 : 0;
+  const negativePercentage = totalReviews > 0 ? (stats.dataset_summary.negative_count / totalReviews) * 100 : 0;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col gap-6">
@@ -81,24 +81,24 @@ export default function DashboardPage() {
 
       {/* Stat Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard 
-          title="Total Reviews" 
-          value={stats.dataset.total_reviews} 
-          unit="reviews" 
+        <StatCard
+          title="Total Reviews"
+          value={stats.dataset_summary.total_reviews}
+          unit="reviews"
+        />
+        <StatCard
+          title="Positive"
+          value={stats.dataset_summary.positive_count}
+          unit={`(${positivePercentage.toFixed(2)}%)`}
+        />
+        <StatCard
+          title="Negative"
+          value={stats.dataset_summary.negative_count}
+          unit={`(${negativePercentage.toFixed(2)}%)`}
         />
         <StatCard 
-          title="Positive" 
-          value={stats.dataset.positive_count} 
-          unit={`(${positivePercentage.toFixed(2)}%)`} 
-        />
-        <StatCard 
-          title="Negative" 
-          value={stats.dataset.negative_count} 
-          unit={`(${negativePercentage.toFixed(2)}%)`} 
-        />
-        <StatCard 
-          title="Dataset Source" 
-          value={stats.dataset.source} 
+          title="Dataset Source"
+          value={stats.dataset_summary.source}
         />
       </div>
 
@@ -106,14 +106,14 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white dark:bg-slate-900 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Sentiment Distribution</h2>
-          <SentimentChart positive={stats.dataset.positive_count} negative={stats.dataset.negative_count} />
+          <SentimentChart positive={stats.dataset_summary.positive_count} negative={stats.dataset_summary.negative_count} />
         </div>
         <div className="bg-white dark:bg-slate-900 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Reliability Breakdown</h2>
-          <ReliabilityChart 
-            high={stats.reliability_breakdown.HIGH} 
-            medium={stats.reliability_breakdown.MEDIUM} 
-            low={stats.reliability_breakdown.LOW} 
+          <ReliabilityChart
+            high={stats.reliability_summary.high_confidence_percentage}
+            medium={stats.reliability_summary.medium_confidence_percentage}
+            low={stats.reliability_summary.low_confidence_percentage}
           />
         </div>
       </div>
@@ -127,7 +127,7 @@ export default function DashboardPage() {
       {/* Failure Analysis */}
       <div className="bg-white dark:bg-slate-900 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Failure Type Analysis</h2>
-        <FailureTypesChart failureTypes={stats.failure_types} />
+        <FailureTypesChart failureTypes={stats.failure_modes} />
       </div>
     </div>
   );

@@ -5,9 +5,9 @@ import io
 import pandas as pd
 from fastapi import APIRouter, File, Request, UploadFile
 
-from backend.exceptions import FileTooLargeError, MissingColumnError, ValidationError
-from backend.ml.preprocessing import clean_review_text
-from backend.schemas.batch import BatchResponse
+from exceptions import FileTooLargeError, MissingColumnError, ValidationError
+from ml.preprocessing import clean_review_text
+from schemas.batch import BatchResponse
 
 router = APIRouter()
 

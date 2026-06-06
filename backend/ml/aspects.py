@@ -5,7 +5,7 @@ from typing import Any, Dict, List
 
 import nltk
 
-from backend.ml.preprocessing import clean_review_text
+from .preprocessing import clean_review_text
 
 ASPECT_KEYWORDS = {
     "battery": ["battery", "charge", "power", "runtime"],

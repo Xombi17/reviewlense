@@ -10,10 +10,14 @@ interface ModelMetrics {
 }
 
 interface ModelTableProps {
-  models: ModelMetrics[];
+  models: Record<string, ModelMetrics>;
 }
 
 export default function ModelTable({ models }: ModelTableProps) {
+  const modelArray = Object.entries(models).map(([key, model]) => ({
+    ...model,
+    key,
+  }));
   return (
     <div className="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
       <table className="w-full text-left border-collapse">
@@ -28,7 +32,7 @@ export default function ModelTable({ models }: ModelTableProps) {
           </tr>
         </thead>
         <tbody>
-          {models.map((model, idx) => (
+          {modelArray.map((model, idx) => (
             <tr 
               key={model.name} 
               className={`text-sm ${

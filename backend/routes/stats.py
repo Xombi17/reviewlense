@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request
 
-from backend.schemas.stats import StatsResponse
+from schemas.stats import StatsResponse
 
 router = APIRouter()
 
