@@ -1,0 +1,53 @@
+{
+  "total_reviews": 19418,
+  "avg_confidence": 0.9169213772983039,
+  "dataset_summary": {
+    "total_reviews": 19418,
+    "positive_count": 17554,
+    "negative_count": 1864,
+    "positive_percentage": 90.40065918220208,
+    "negative_percentage": 9.59934081779792,
+    "source": "Hugging Face McAuley-Lab/Amazon-Reviews-2023"
+  },
+  "models": {
+    "lr": {
+      "accuracy": 0.9312564366632338,
+      "precision": 0.9313829787234043,
+      "recall": 0.9974366277413842,
+      "f1": 0.9632787787099436,
+      "auc": 0.960558276057706,
+      "name": "Logistic Regression",
+      "is_default": true
+    },
+    "nb": {
+      "accuracy": 0.9067971163748713,
+      "precision": 0.9065324038213272,
+      "recall": 1.0,
+      "f1": 0.9509750812567714,
+      "auc": 0.9221886327383184,
+      "name": "Multinomial Naive Bayes",
+      "is_default": false
+    },
+    "svm": {
+      "accuracy": 0.9508238928939238,
+      "precision": 0.9621380846325167,
+      "recall": 0.9843349473084592,
+      "f1": 0.9731099535407575,
+      "auc": 0.9644060070112851,
+      "name": "Linear SVM (Calibrated)",
+      "is_default": false
+    }
+  },
+  "reliability_summary": {
+    "high_confidence_percentage": 75.84963954685891,
+    "medium_confidence_percentage": 18.357363542739442,
+    "low_confidence_percentage": 5.792996910401648
+  },
+  "failure_modes": {
+    "mixed_sentiment": 2.0,
+    "sarcasm": 1.0,
+    "comparative": 2.0,
+    "short_review": 3.0,
+    "negation_failure": 7.0
+  }
+}

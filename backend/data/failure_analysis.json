@@ -1,0 +1,107 @@
+[
+  {
+    "review_text": "pick thick clunky not readily heat formable resize adjust convexity tip heat open top resistant resetting fit finger mean stuck box plastic pick small large family member also metal pick thick appear not annealed also not formable next time buy ernie ball dunlop pay bit sell really good metal pick wide variety size thickness plastic pick",
+    "true_sentiment": 0,
+    "predicted_sentiment": 1,
+    "confidence": 0.7401365679117701,
+    "failure_type": "negation_failure"
+  },
+  {
+    "review_text": "leather design first look beautiful however standard yamaha flute case not fit reunion blue zipper not close yamaha handle wish mentioned description saving buy carrying case return real disappointment",
+    "true_sentiment": 0,
+    "predicted_sentiment": 1,
+    "confidence": 0.547586144363965,
+    "failure_type": "mixed_sentiment"
+  },
+  {
+    "review_text": "string not last long one bought store not sure amazon old one 3 pack purchased broke faster string gotten make sure get store next time normally wonderful great sound last longer",
+    "true_sentiment": 0,
+    "predicted_sentiment": 1,
+    "confidence": 0.7688251772530124,
+    "failure_type": "negation_failure"
+  },
+  {
+    "review_text": "seems well made not fit 4 4 violin titch small",
+    "true_sentiment": 0,
+    "predicted_sentiment": 1,
+    "confidence": 0.6296868705102477,
+    "failure_type": "negation_failure"
+  },
+  {
+    "review_text": "9and 10 hole crackle",
+    "true_sentiment": 0,
+    "predicted_sentiment": 1,
+    "confidence": 0.8066233974670785,
+    "failure_type": "short_review"
+  },
+  {
+    "review_text": "thinner string set short reach tuner key unusable fender squier vi bass",
+    "true_sentiment": 0,
+    "predicted_sentiment": 1,
+    "confidence": 0.8217097365339355,
+    "failure_type": "comparative"
+  },
+  {
+    "review_text": "exactly 12 inch measure outside spout outside edge please not advertise 12 14 inch horn slightly 11 inch tip tip ignoring curve bought one ebay almost half price longer wider knocked another star annoying sticker horn big time consuming remove not put advertisement card include optional vinyl sticker bag smell not counting realize horn trapped inside horn not smell inside several white powdery streak not sure make horn not",
+    "true_sentiment": 0,
+    "predicted_sentiment": 1,
+    "confidence": 0.7254110109548038,
+    "failure_type": "negation_failure"
+  },
+  {
+    "review_text": "purchased teenage girl party odor fog solution faintly unpleasant high drama among teenage girl fog effect also minimal",
+    "true_sentiment": 0,
+    "predicted_sentiment": 1,
+    "confidence": 0.9007521010779893,
+    "failure_type": "comparative"
+  },
+  {
+    "review_text": "yet use cable anything not make noise crackle snap pop sure something wrong soldering inside taking chin well frankly not super pleased amazon 's customer support lately not look like buying much amazon anyway would rather take eat loss one deal inconsistency amazon 's customer support return frankly",
+    "true_sentiment": 0,
+    "predicted_sentiment": 1,
+    "confidence": 0.7042724332250617,
+    "failure_type": "mixed_sentiment"
+  },
+  {
+    "review_text": "expensive concerned moment",
+    "true_sentiment": 0,
+    "predicted_sentiment": 1,
+    "confidence": 0.8591950928814958,
+    "failure_type": "short_review"
+  },
+  {
+    "review_text": "ordering boxed program expecting zip drive cd product would upload computer much process",
+    "true_sentiment": 0,
+    "predicted_sentiment": 1,
+    "confidence": 0.7719112124824289,
+    "failure_type": "sarcasm"
+  },
+  {
+    "review_text": "headphone make listening music sound wonderful audiophile forum love thing first not expect last long term part reinforced made cheaply dropping hardwood floor 3ft snapped no way repair good lasted wished got something bit durable",
+    "true_sentiment": 0,
+    "predicted_sentiment": 1,
+    "confidence": 0.8396716898507608,
+    "failure_type": "negation_failure"
+  },
+  {
+    "review_text": "tuning fine one week battery died",
+    "true_sentiment": 0,
+    "predicted_sentiment": 1,
+    "confidence": 0.726076416427619,
+    "failure_type": "short_review"
+  },
+  {
+    "review_text": "not quality stage product inexpensive mic look desk one day use actual recording switch mic clip top screw crimped came soon started screwing clip use plier hold installing place back top stand could never use go stand many stage product definitely not meet normal quality standard",
+    "true_sentiment": 0,
+    "predicted_sentiment": 1,
+    "confidence": 0.657592861962641,
+    "failure_type": "negation_failure"
+  },
+  {
+    "review_text": "son used one day fell apart not useable not good quality",
+    "true_sentiment": 0,
+    "predicted_sentiment": 1,
+    "confidence": 0.5869905195697376,
+    "failure_type": "negation_failure"
+  }
+]
