@@ -4,6 +4,15 @@
 
 ---
 
+## User Preferences
+
+| Preference | Value |
+|-----------|-------|
+| **Auto-commit** | ❌ Disabled — never commit without explicit user action |
+| **Staging** | Agent may `git add` files, but `git commit` is always manual |
+
+---
+
 ## Current Status
 
 | Field | Value |

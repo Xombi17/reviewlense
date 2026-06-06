@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "created": "2026-06-06",
   "workflow": {
-    "auto_commit": true,
+    "auto_commit": false,
     "require_approval": true,
     "parallel_execution": true,
     "model_profile": "balanced"
