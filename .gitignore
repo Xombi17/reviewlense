@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Large data files
+backend/data/raw/
+*.csv
+*.parquet
+
+# ML model artifacts (regenerate from notebooks)
+backend/models/*.pkl
+
+# Next.js
+frontend/.next/
+frontend/node_modules/
+frontend/out/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Stats JSON (regenerated from training)
+# Keep stats.json in repo for demo purposes (NOT gitignored)
