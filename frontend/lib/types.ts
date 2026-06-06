@@ -74,12 +74,52 @@ export interface ReliabilitySummary {
  * Contains dataset summary, model metrics, and reliability breakdowns.
  */
 export interface StatsResponse {
-  dataset_summary: DatasetSummary;
-  models: Record<string, ModelMetrics>;
-  reliability_summary: ReliabilitySummary;
-  failure_modes: Record<string, number>;
-  total_reviews: number;
-  avg_confidence: number;
+  dataset: {
+    total_reviews: number;
+    positive_count: number;
+    negative_count: number;
+    source: string;
+  };
+  models: Array<{
+    name: string;
+    accuracy: number;
+    precision: number;
+    recall: number;
+    f1: number;
+    is_default: boolean;
+  }>;
+  reliability_breakdown: {
+    HIGH: number;
+    MEDIUM: number;
+    LOW: number;
+  };
+  failure_types: Record<string, number>;
+}
+
+/**
+ * Derived data used by the dashboard components.
+ */
+export interface DashboardStats {
+  totalReviews: number;
+  positivePercentage: number;
+  negativePercentage: number;
+  datasetSource: string;
+  positiveCount: number;
+  negativeCount: number;
+  models: Array<{
+    name: string;
+    accuracy: number;
+    precision: number;
+    recall: number;
+    f1: number;
+    is_default: boolean;
+  }>;
+  reliability: {
+    high: number;
+    medium: number;
+    low: number;
+  };
+  failureTypes: Record<string, number>;
 }
 
 /**
