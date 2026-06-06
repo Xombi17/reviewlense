@@ -10,12 +10,17 @@ export default function FlagsList({ flags }: FlagsListProps) {
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-wrap gap-2">
       {flags.map((flag, idx) => (
-        <div key={idx} className="rounded-lg py-2 px-3 text-sm bg-amber-50 text-amber-700 w-fit font-medium">
-          ⚠️ {flag.replace(/_/g, ' ')}
+        <div 
+          key={idx} 
+          className="rounded px-2.5 py-1 text-xs bg-orange-100 text-orange-900 dark:bg-orange-950/30 dark:text-orange-400 font-semibold flex items-center gap-1 hover:shadow-sm transition-shadow duration-200"
+        >
+          <span className="w-4 h-4 inline-flex items-center justify-center">⚠️</span>
+          <span>{flag.replace(/_/g, ' ')}</span>
         </div>
       ))}
     </div>
   );
 }
+
