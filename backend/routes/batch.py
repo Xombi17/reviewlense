@@ -17,6 +17,21 @@ BATCH_MODEL = "lr"
 TOP_N = 3
 
 
+def _get_predictor(request: Request):
+    """Get predictor from app.state (standard) or fallback to Vercel getter."""
+    if hasattr(request.app.state, "predictor") and request.app.state.predictor is not None:
+        return request.app.state.predictor
+    from api.index import get_predictor
+    return get_predictor()
+
+
+def _get_trust_analyzer(request: Request):
+    if hasattr(request.app.state, "trust_analyzer") and request.app.state.trust_analyzer is not None:
+        return request.app.state.trust_analyzer
+    from api.index import get_trust_analyzer
+    return get_trust_analyzer()
+
+
 @router.post("/batch", response_model=BatchResponse)
 async def batch_predict(
     request: Request, file: UploadFile = File(...)
@@ -42,8 +57,8 @@ async def batch_predict(
     if total_rows > MAX_ROWS:
         raise ValidationError(f"CSV has {total_rows} rows; maximum allowed is {MAX_ROWS}.")
 
-    predictor = request.app.state.predictor
-    trust_analyzer = request.app.state.trust_analyzer
+    predictor = _get_predictor(request)
+    trust_analyzer = _get_trust_analyzer(request)
 
     sentiment_distribution = {"positive": 0, "negative": 0}
     reliability_breakdown = {"HIGH": 0, "MEDIUM": 0, "LOW": 0}

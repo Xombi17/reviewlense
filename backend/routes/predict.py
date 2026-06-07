@@ -9,21 +9,53 @@ from schemas.predict import AspectSentiment, PredictRequest, PredictResponse
 router = APIRouter()
 
 
+def _get_loader(request: Request):
+    """Get loader from app.state (standard) or fallback to Vercel getter."""
+    if hasattr(request.app.state, "loader") and request.app.state.loader is not None:
+        return request.app.state.loader
+    # Vercel serverless fallback
+    from api.index import get_loader
+    return get_loader()
+
+
+def _get_predictor(request: Request):
+    if hasattr(request.app.state, "predictor") and request.app.state.predictor is not None:
+        return request.app.state.predictor
+    from api.index import get_predictor
+    return get_predictor()
+
+
+def _get_extractor(request: Request):
+    if hasattr(request.app.state, "extractor") and request.app.state.extractor is not None:
+        return request.app.state.extractor
+    from api.index import get_extractor
+    return get_extractor()
+
+
+def _get_trust_analyzer(request: Request):
+    if hasattr(request.app.state, "trust_analyzer") and request.app.state.trust_analyzer is not None:
+        return request.app.state.trust_analyzer
+    from api.index import get_trust_analyzer
+    return get_trust_analyzer()
+
+
 @router.post("/predict", response_model=PredictResponse)
 async def predict(request: Request, body: PredictRequest) -> PredictResponse:
     """Analyze a single product review."""
     if not body.review or not body.review.strip():
         raise EmptyReviewError("Review text is empty or whitespace-only.")
 
-    available_models = list(request.app.state.loader.models.keys())
+    loader = _get_loader(request)
+    available_models = list(loader.models.keys())
     if body.model not in available_models:
         raise ModelNotFoundError(
             f"Model '{body.model}' is not loaded. Available: {available_models}"
         )
 
     cleaned_review = clean_review_text(body.review)
+    predictor = _get_predictor(request)
     if cleaned_review:
-        sentiment_result = request.app.state.predictor.predict_sentiment(
+        sentiment_result = predictor.predict_sentiment(
             cleaned_review, model_name=body.model
         )
     else:
@@ -34,7 +66,8 @@ async def predict(request: Request, body: PredictRequest) -> PredictResponse:
             "flags": ["uncertain_prediction", "empty_text"],
         }
 
-    aspects_raw = request.app.state.extractor.extract_aspects(
+    extractor = _get_extractor(request)
+    aspects_raw = extractor.extract_aspects(
         body.review, model_name=body.model
     )
     aspects = [
@@ -46,7 +79,8 @@ async def predict(request: Request, body: PredictRequest) -> PredictResponse:
         for aspect in aspects_raw
     ]
 
-    trust_result = request.app.state.trust_analyzer.calculate_trust_score(body.review)
+    trust_analyzer = _get_trust_analyzer(request)
+    trust_result = trust_analyzer.calculate_trust_score(body.review)
     merged_flags = list(sentiment_result["flags"]) + list(trust_result["flags"])
 
     seen_flags: set[str] = set()

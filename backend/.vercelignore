@@ -1,0 +1,49 @@
+# Vercel ignore file for backend
+# Exclude files not needed for serverless deployment
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Test files
+tests/
+*.pytest_cache/
+
+# Training scripts and data (not needed for inference)
+ml/train.py
+ml/build_multidomain_dataset.py
+ml/extract_balanced_data.py
+data/processed_train_reviews.csv
+data/processed_test_reviews.csv
+data/processed_reviews.csv
+
+# Docker
+Dockerfile
+docker-compose.yml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Local development
+.env
+.env.local
+
+# Jupyter
+*.ipynb

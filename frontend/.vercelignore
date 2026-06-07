@@ -1,0 +1,42 @@
+# Vercel ignore file for frontend
+# Exclude files not needed for deployment
+
+# Dependencies
+node_modules/
+
+# Build output (except when using output: standalone)
+.next/
+out/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Local development
+.env
+.env.local
+.env*.local
+
+# Testing
+coverage/
+*.lcov
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Docker
+Dockerfile
+docker-compose.yml
+
+# Misc
+*.md
+!README.md
