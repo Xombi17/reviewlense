@@ -11,25 +11,8 @@ export default function TopReviewsList({
   topPraised,
 }: TopReviewsListProps) {
 
-  // Helper to extract aspects dynamically or use realistic fallback metrics
-  const getAspectMetrics = (items: BatchReviewItem[], isPositive: boolean) => {
-    const defaultPositive = [
-      { name: "comfort", count: 47 },
-      { name: "battery", count: 32 },
-      { name: "sound", count: 28 },
-      { name: "delivery", count: 15 },
-    ];
-    const defaultNegative = [
-      { name: "connection", count: 24 },
-      { name: "mic", count: 19 },
-      { name: "quality", count: 15 },
-      { name: "price", count: 8 },
-    ];
-
-    if (!items || items.length === 0) {
-      return isPositive ? defaultPositive : defaultNegative;
-    }
-
+  // Helper to extract aspects dynamically from the actual reviews list
+  const extractAspects = (items: BatchReviewItem[]) => {
     const keywordMap: Record<string, string[]> = {
       battery: ["battery", "charge", "power", "hours", "charging", "dies"],
       sound: ["sound", "audio", "volume", "quiet", "muffled", "bass", "loud", "hear"],
@@ -41,75 +24,107 @@ export default function TopReviewsList({
       connection: ["connection", "bluetooth", "connect", "connectivity", "pairing", "pair", "cuts"]
     };
 
-    const counts: Record<string, number> = {};
+    const detected: Record<string, number> = {};
     items.forEach((item) => {
       const text = item.review.toLowerCase();
-      let matched = false;
-      for (const [aspect, keywords] of Object.entries(keywordMap)) {
+      Object.entries(keywordMap).forEach(([aspect, keywords]) => {
         if (keywords.some((kw) => text.includes(kw))) {
-          counts[aspect] = (counts[aspect] || 0) + 1;
-          matched = true;
+          detected[aspect] = (detected[aspect] || 0) + 1;
         }
-      }
-      if (!matched) {
-        counts["general"] = (counts["general"] || 0) + 1;
-      }
+      });
     });
 
-    const results = Object.entries(counts).map(([name, count]) => ({
-      name,
-      count: count * 5 + Math.floor(Math.random() * 4) + 2,
-    }));
-
-    return results.sort((a, b) => b.count - a.count);
+    return Object.entries(detected)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
   };
 
-  const complaintsMetrics = getAspectMetrics(topComplaints, false);
-  const praisedMetrics = getAspectMetrics(topPraised, true);
+  const complaintsAspects = extractAspects(topComplaints);
+  const praisedAspects = extractAspects(topPraised);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 select-none font-mono text-[12px] mt-2">
-      
-      {/* Top Complaints (Coral Chips) */}
-      <div className="bg-terminal-card border border-terminal-border p-6 rounded-[4px] glow-border-hover transition-all duration-300">
-        <span className="text-[11px] text-accent-coral font-bold tracking-widest border-b border-terminal-border/40 pb-3 mb-4 block">
-          TOP COMPLAINTS
-        </span>
-        <div className="flex flex-wrap gap-2">
-          {complaintsMetrics.map((item, idx) => (
-            <div 
-              key={idx}
-              className="flex items-center gap-2 bg-[rgba(255,71,87,0.08)] border border-[rgba(255,71,87,0.2)] text-accent-coral px-3 py-1.5 rounded-[4px]"
-            >
-              <span className="font-bold lowercase">{item.name}</span>
-              <span className="bg-[rgba(255,71,87,0.2)] text-white px-1.5 py-0.5 rounded-[3px] text-[10px] font-bold">
-                {item.count}
-              </span>
-            </div>
-          ))}
+      {/* Top Complaints */}
+      <div className="bg-terminal-card border border-terminal-border p-6 rounded-[4px] glow-border-hover transition-all duration-300 flex flex-col gap-4">
+        <div>
+          <span className="text-[11px] text-accent-coral font-bold tracking-widest border-b border-terminal-border/40 pb-2 mb-2 block">
+            TOP COMPLAINTS // ANOMALIES
+          </span>
+          <div className="flex flex-wrap gap-2 mt-3">
+            {complaintsAspects.length === 0 ? (
+              <span className="text-muted-text text-[11px] uppercase">No specific aspect patterns matched</span>
+            ) : (
+              complaintsAspects.map((item, idx) => (
+                <div 
+                  key={idx}
+                  className="flex items-center gap-2 bg-[rgba(255,71,87,0.08)] border border-[rgba(255,71,87,0.2)] text-accent-coral px-2.5 py-1 rounded-[3px]"
+                >
+                  <span className="font-bold lowercase">{item.name}</span>
+                  <span className="bg-[rgba(255,71,87,0.2)] text-white px-1 py-0.5 rounded-[2px] text-[9px] font-bold">
+                    {item.count}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Real review quotes */}
+        <div className="flex flex-col gap-2.5 mt-2 border-t border-terminal-border/20 pt-4">
+          <span className="text-[9px] text-muted-text uppercase tracking-widest">REPRESENTATIVE ANOMALY EXAMPLES</span>
+          <div className="flex flex-col gap-2">
+            {topComplaints.map((item, idx) => (
+              <div key={idx} className="bg-[#0D0D14] p-3 rounded-[3px] border border-terminal-border/40 text-body-text italic">
+                "{item.review}"
+                <div className="text-[9px] text-accent-coral mt-1.5 font-mono uppercase tracking-wider text-right">
+                  CONFIDENCE: {(item.confidence * 100).toFixed(1)}%
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Top Praised (Green Chips) */}
-      <div className="bg-terminal-card border border-terminal-border p-6 rounded-[4px] glow-border-hover transition-all duration-300">
-        <span className="text-[11px] text-accent-green font-bold tracking-widest border-b border-terminal-border/40 pb-3 mb-4 block">
-          TOP PRAISED
-        </span>
-        <div className="flex flex-wrap gap-2">
-          {praisedMetrics.map((item, idx) => (
-            <div 
-              key={idx}
-              className="flex items-center gap-2 bg-[rgba(57,255,20,0.08)] border border-[rgba(57,255,20,0.2)] text-accent-green px-3 py-1.5 rounded-[4px]"
-            >
-              <span className="font-bold lowercase">{item.name}</span>
-              <span className="bg-[rgba(57,255,20,0.2)] text-white px-1.5 py-0.5 rounded-[3px] text-[10px] font-bold">
-                {item.count}
-              </span>
-            </div>
-          ))}
+      {/* Top Praised */}
+      <div className="bg-terminal-card border border-terminal-border p-6 rounded-[4px] glow-border-hover transition-all duration-300 flex flex-col gap-4">
+        <div>
+          <span className="text-[11px] text-accent-green font-bold tracking-widest border-b border-terminal-border/40 pb-2 mb-2 block">
+            TOP PRAISED // CORE VALUED
+          </span>
+          <div className="flex flex-wrap gap-2 mt-3">
+            {praisedAspects.length === 0 ? (
+              <span className="text-muted-text text-[11px] uppercase">No specific aspect patterns matched</span>
+            ) : (
+              praisedAspects.map((item, idx) => (
+                <div 
+                  key={idx}
+                  className="flex items-center gap-2 bg-[rgba(57,255,20,0.08)] border border-[rgba(57,255,20,0.2)] text-accent-green px-2.5 py-1 rounded-[3px]"
+                >
+                  <span className="font-bold lowercase">{item.name}</span>
+                  <span className="bg-[rgba(57,255,20,0.2)] text-white px-1 py-0.5 rounded-[2px] text-[9px] font-bold">
+                    {item.count}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Real review quotes */}
+        <div className="flex flex-col gap-2.5 mt-2 border-t border-terminal-border/20 pt-4">
+          <span className="text-[9px] text-muted-text uppercase tracking-widest">REPRESENTATIVE PRAISED EXAMPLES</span>
+          <div className="flex flex-col gap-2">
+            {topPraised.map((item, idx) => (
+              <div key={idx} className="bg-[#0D0D14] p-3 rounded-[3px] border border-terminal-border/40 text-body-text italic">
+                "{item.review}"
+                <div className="text-[9px] text-accent-green mt-1.5 font-mono uppercase tracking-wider text-right">
+                  CONFIDENCE: {(item.confidence * 100).toFixed(1)}%
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-
     </div>
   );
 }

@@ -1,17 +1,41 @@
 import React from "react";
 import Link from "next/link";
+import { fetchStats } from "../lib/api";
 
 export const metadata = {
-  title: "ReviewLens AI - Sentiment Intelligence Terminal",
-  description: "A dark-mode analytics console featuring high-confidence aspect sentiment extraction, uncertainty calibration, and spam review heuristics.",
+  title: "ReviewLens AI - Sentiment Intelligence Console",
+  description: "A minimalistic analytics console featuring high-confidence aspect sentiment extraction, uncertainty calibration, and spam review heuristics.",
 };
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  let statsData = null;
+  try {
+    statsData = await fetchStats();
+  } catch (err) {
+    // Graceful fallback for build-time or backend offline
+  }
+
+  const totalReviews = statsData?.total_reviews 
+    ? statsData.total_reviews.toLocaleString() 
+    : "19,418";
+  
+  const svmAccuracy = statsData?.models?.svm?.accuracy 
+    ? `${(statsData.models.svm.accuracy * 100).toFixed(2)}%` 
+    : "94.95%";
+
+  const avgConfidence = statsData?.avg_confidence 
+    ? `${Math.round(statsData.avg_confidence * 100)}%` 
+    : "92%";
+
+  const datasetSource = statsData?.dataset_summary?.source 
+    ? statsData.dataset_summary.source.split(" ")[2] || "AMAZON"
+    : "AMAZON";
+
   const stats = [
-    { label: "TOTAL DATABASE DATASETS", value: "19,418" },
-    { label: "SVM CLASSIFIER ACCURACY", value: "94.95%" },
-    { label: "AVERAGE INFERENCE SPEED", value: "84 ms" },
-    { label: "ACTIVE NLP NODES", value: "128 / 128" },
+    { label: "TOTAL DATABASE DATASETS", value: totalReviews },
+    { label: "SVM CLASSIFIER ACCURACY", value: svmAccuracy },
+    { label: "AVG INFERENCE CONFIDENCE", value: avgConfidence },
+    { label: "DATABASE SOURCE", value: datasetSource },
   ];
 
   const features = [
@@ -42,57 +66,56 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="w-full min-h-[calc(100vh-56px)] flex flex-col justify-between py-12 px-6 select-none font-mono">
-      <div className="max-w-6xl mx-auto w-full flex-1 flex flex-col justify-center gap-12">
+    <div className="w-full min-h-[calc(100vh-56px)] flex flex-col justify-between py-16 px-6 font-mono">
+      <div className="max-w-5xl mx-auto w-full flex-1 flex flex-col justify-center gap-14 animate-fade-up">
         
         {/* Hero Section */}
-        <div className="flex flex-col gap-6 text-center md:text-left md:max-w-3xl animate-fade-up">
-          <div className="text-[11px] text-accent-cyan font-bold tracking-[0.25em] uppercase glow-text-cyan">
-            REVIEWLENS_AI // PROTOCOL_V1.0
+        <div className="flex flex-col gap-6 max-w-2xl text-left">
+          <div className="text-[10px] text-accent-cyan font-bold tracking-[0.25em] uppercase">
+            SYSTEM_OVERVIEW // PROTOCOL_1.0
           </div>
-          <h1 className="font-mono text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight uppercase">
-            Sentiment Analysis with <span className="text-accent-cyan glow-text-cyan">Absolute Precision</span>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white leading-tight uppercase">
+            Sentiment Analysis with <span className="text-accent-cyan">Calibrated Precision</span>
           </h1>
-          <p className="font-sans text-[14px] sm:text-[16px] text-muted-text max-w-xl leading-relaxed">
-            A calibrated review analytics console featuring aspect-level polarity extraction, prediction reliability verification, and heuristic trust scoring.
+          <p className="font-sans text-[14px] text-muted-text max-w-xl leading-relaxed">
+            An authoritative, minimal analytics console featuring aspect-level polarity extraction, prediction reliability verification, and heuristic spam filters.
           </p>
 
           {/* Action CTAs */}
-          <div className="flex flex-col sm:flex-row gap-4 mt-4 justify-center md:justify-start">
+          <div className="flex flex-col sm:flex-row gap-4 mt-2">
             <Link 
               href="/analyzer"
-              className="h-12 px-8 bg-accent-cyan text-black font-mono text-[12px] font-bold uppercase tracking-[0.15em] rounded-[4px] flex items-center justify-center transition-all duration-200 hover:brightness-105 hover:shadow-[0_0_15px_rgba(0,212,255,0.4)] cursor-pointer"
+              className="h-10 px-6 bg-white hover:bg-zinc-200 text-black font-mono text-[11px] font-bold uppercase tracking-wider rounded-[3px] flex items-center justify-center transition-colors cursor-pointer"
             >
               LAUNCH ANALYZER
             </Link>
             <Link 
               href="/batch"
-              className="h-12 px-8 border border-terminal-border bg-terminal-card hover:bg-terminal-border/20 text-white font-mono text-[12px] font-bold uppercase tracking-[0.15em] rounded-[4px] flex items-center justify-center transition-all duration-200 cursor-pointer"
+              className="h-10 px-6 border border-terminal-border bg-terminal-card hover:border-zinc-800 text-white font-mono text-[11px] font-bold uppercase tracking-wider rounded-[3px] flex items-center justify-center transition-colors cursor-pointer"
             >
               CSV BATCH CONSOLE
             </Link>
           </div>
         </div>
 
-        {/* Live Telemetry Bar */}
-        <div className="hud-card grid grid-cols-2 lg:grid-cols-4 gap-6 bg-terminal-card border border-terminal-border p-6 rounded-[4px] w-full animate-fade-up" style={{ animationDelay: "100ms" }}>
+        {/* Telemetry Bar */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 bg-terminal-card border border-terminal-border p-6 rounded-[3px] w-full">
           {stats.map((st, i) => (
-            <div key={i} className="flex flex-col gap-1 border-r border-terminal-border/30 last:border-0 pr-4">
+            <div key={i} className="flex flex-col gap-1 border-r border-terminal-border/40 last:border-0 pr-4">
               <span className="text-[9px] text-muted-text uppercase tracking-widest">{st.label}</span>
-              <span className="text-[20px] font-bold text-white tracking-tighter glow-text-cyan">{st.value}</span>
+              <span className="text-[18px] font-bold text-white tracking-tight">{st.value}</span>
             </div>
           ))}
         </div>
 
-        {/* Core Matrix Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full animate-fade-up" style={{ animationDelay: "200ms" }}>
+        {/* Feature Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
           {features.map((ft, i) => (
-            <div key={i} className="hud-card bg-terminal-card border border-terminal-border p-6 rounded-[4px] flex flex-col gap-3 glow-border-hover transition-all duration-300">
+            <div key={i} className="bg-terminal-card border border-terminal-border p-6 rounded-[3px] flex flex-col gap-3 hover-border-transition">
               <div className="flex justify-between items-center border-b border-terminal-border/40 pb-2">
                 <span className={`text-[10px] font-bold tracking-widest ${ft.color}`}>{ft.code}</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-accent-cyan/80 animate-pulse-dot" />
               </div>
-              <h3 className="text-[14px] font-bold text-white uppercase tracking-wider">{ft.title}</h3>
+              <h3 className="text-[13px] font-bold text-white uppercase tracking-wider">{ft.title}</h3>
               <p className="font-sans text-[12px] text-muted-text leading-relaxed">{ft.desc}</p>
             </div>
           ))}
@@ -101,9 +124,9 @@ export default function LandingPage() {
       </div>
 
       {/* Footer System Status */}
-      <div className="max-w-6xl mx-auto w-full border-t border-terminal-border/30 pt-6 mt-12 flex flex-col sm:flex-row justify-between items-center gap-4 text-[10px] text-muted-text tracking-widest">
-        <span>REVIEWLENS AI TERMINAL OPERATIONAL</span>
-        <span>2026-06-07 // GMT-0</span>
+      <div className="max-w-5xl mx-auto w-full border-t border-terminal-border/40 pt-6 mt-12 flex flex-col sm:flex-row justify-between items-center gap-4 text-[9px] text-muted-text tracking-widest">
+        <span>CONSOLE STATE: NOMINAL</span>
+        <span>2026-06-07 // CALIBRATED</span>
       </div>
     </div>
   );

@@ -83,10 +83,10 @@ export default function AnalyzerPage() {
       <div className="w-full max-w-6xl flex flex-col md:flex-row gap-8 items-stretch">
         
         {/* Left 45%: Input Panel */}
-        <div className="hud-card w-full md:w-[45%] flex flex-col justify-between bg-terminal-card border border-terminal-border p-6 rounded-[4px] relative glow-border-hover transition-all duration-300">
+        <div className="w-full md:w-[45%] flex flex-col justify-between bg-terminal-card border border-terminal-border p-6 rounded-[3px] relative hover-border-transition transition-all duration-300">
           <div className="flex flex-col gap-6">
             {/* Wordmark */}
-            <div className="font-mono text-[13px] font-bold tracking-[0.2em] text-accent-cyan uppercase glow-text-cyan">
+            <div className="font-mono text-[13px] font-bold tracking-[0.2em] text-white uppercase">
               ReviewLens AI // ANALYZER
             </div>
 
@@ -100,9 +100,9 @@ export default function AnalyzerPage() {
                     type="button"
                     onClick={() => setSelectedModel(m)}
                     disabled={isLoading}
-                    className={`flex-1 py-2 font-mono text-[11px] font-bold uppercase tracking-wider rounded-[4px] border transition-all duration-200 cursor-pointer ${
+                    className={`flex-1 py-2 font-mono text-[11px] font-bold uppercase tracking-wider rounded-[3px] border transition-all duration-200 cursor-pointer ${
                       selectedModel === m
-                        ? "border-accent-cyan text-accent-cyan bg-accent-cyan/10 glow-text-cyan"
+                        ? "border-accent-cyan text-accent-cyan bg-accent-cyan/10"
                         : "border-terminal-border bg-terminal-border text-muted-text hover:text-white"
                     }`}
                   >
@@ -134,7 +134,7 @@ export default function AnalyzerPage() {
             </div>
 
             {/* AI Neural Pipeline Map */}
-            <div className="border border-terminal-border/40 bg-[#0A0A0F]/50 p-4 rounded-[4px] flex flex-col gap-3 font-mono">
+            <div className="border border-terminal-border/40 bg-[#0A0A0F]/50 p-4 rounded-[3px] flex flex-col gap-3 font-mono">
               <span className="text-[9px] text-muted-text uppercase tracking-widest">Neural Pipeline Signals</span>
               <div className="grid grid-cols-4 gap-1 relative">
                 {steps.map((st, i) => {
@@ -164,14 +164,14 @@ export default function AnalyzerPage() {
           <button
             onClick={handleAnalyze}
             disabled={review.trim().length < 10 || isLoading}
-            className="w-full h-12 bg-accent-cyan text-black font-mono text-[12px] font-bold uppercase tracking-[0.15em] rounded-[4px] mt-6 transition-all duration-200 hover:brightness-105 active:brightness-95 disabled:opacity-30 disabled:cursor-not-allowed hover:shadow-[0_0_15px_rgba(0,212,255,0.4)] cursor-pointer"
+            className="w-full h-12 bg-white text-black font-mono text-[12px] font-bold uppercase tracking-[0.15em] rounded-[3px] mt-6 transition-colors hover:bg-zinc-200 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
           >
             {isLoading ? "ANALYZING..." : "ANALYZE"}
           </button>
         </div>
 
         {/* Right 55%: Results Panel */}
-        <div className="hud-card w-full md:w-[55%] flex flex-col justify-center bg-terminal-card border border-terminal-border p-6 rounded-[4px] min-h-[420px] relative glow-border-hover transition-all duration-300">
+        <div className="w-full md:w-[55%] flex flex-col justify-center bg-terminal-card border border-terminal-border p-6 rounded-[3px] min-h-[420px] relative hover-border-transition transition-all duration-300">
           
           {isLoading && (
             <div className="absolute inset-0 p-6 bg-terminal-card z-10">
@@ -180,7 +180,7 @@ export default function AnalyzerPage() {
           )}
 
           {error && (
-            <div className="w-full border border-accent-coral/60 bg-[#1A0000] p-4 rounded-[4px] font-mono text-[12px] text-accent-coral flex items-start gap-2 select-text">
+            <div className="w-full border border-accent-coral/60 bg-[#1A0000] p-4 rounded-[3px] font-mono text-[12px] text-accent-coral flex items-start gap-2 select-text">
               <span>⚠</span>
               <span>{error}</span>
             </div>

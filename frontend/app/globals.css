@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 @theme {
-  --color-terminal-bg: #0A0A0F;
-  --color-terminal-card: #111118;
-  --color-terminal-border: #1E1E2E;
-  --color-accent-cyan: #00D4FF;
-  --color-accent-green: #39FF14;
-  --color-accent-coral: #FF4757;
-  --color-accent-amber: #FFB800;
-  --color-body-text: #C8C8D4;
-  --color-muted-text: #5A5A72;
+  --color-terminal-bg: #09090B;
+  --color-terminal-card: #121215;
+  --color-terminal-border: #1E1E24;
+  --color-accent-cyan: #06B6D4;
+  --color-accent-green: #10B981;
+  --color-accent-coral: #EF4444;
+  --color-accent-amber: #F59E0B;
+  --color-body-text: #E4E4E7;
+  --color-muted-text: #71717A;
 
   --font-sans: var(--font-dm-sans), sans-serif;
   --font-mono: var(--font-ibm-plex-mono), monospace;
@@ -17,7 +17,7 @@
 
 /* Custom Scrollbars */
 * {
-  scrollbar-color: #00D4FF #1E1E2E;
+  scrollbar-color: #3F3F46 #1E1E24;
   scrollbar-width: thin;
 }
 
@@ -27,77 +27,30 @@
     height: 4px;
   }
   ::-webkit-scrollbar-thumb {
-    background: #00D4FF;
+    background: #3F3F46;
     border-radius: 2px;
   }
   ::-webkit-scrollbar-track {
-    background: #1E1E2E;
+    background: #1E1E24;
   }
 }
 
 html {
   scrollbar-gutter: stable;
-  background-color: #0A0A0F;
+  background-color: #09090B;
 }
 
 body {
-  background-color: #0A0A0F;
-  background-image: 
-    radial-gradient(at 5% 15%, rgba(0, 212, 255, 0.08) 0px, transparent 40%),
-    radial-gradient(at 95% 85%, rgba(139, 92, 246, 0.06) 0px, transparent 45%),
-    radial-gradient(circle, #1A1A2E 1px, transparent 1px),
-    repeating-linear-gradient(135deg, rgba(0, 212, 255, 0.015) 0px, rgba(0, 212, 255, 0.015) 1.5px, transparent 1.5px, transparent 6px);
-  background-size: 100% 100%, 100% 100%, 24px 24px, 100% 100%;
-  background-attachment: fixed;
-  color: #C8C8D4;
+  background-color: #09090B;
+  color: #E4E4E7;
   font-family: var(--font-dm-sans), sans-serif;
 }
 
-/* HUD accent brackets */
-.hud-card {
-  position: relative;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.hud-card::before {
-  content: '';
-  position: absolute;
-  top: -1px;
-  left: -1px;
-  width: 6px;
-  height: 6px;
-  border-top: 2px solid #00D4FF;
-  border-left: 2px solid #00D4FF;
-  opacity: 0.6;
-  pointer-events: none;
-  transition: all 0.3s ease;
-}
-
-.hud-card::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  right: -1px;
-  width: 6px;
-  height: 6px;
-  border-bottom: 2px solid #00D4FF;
-  border-right: 2px solid #00D4FF;
-  opacity: 0.6;
-  pointer-events: none;
-  transition: all 0.3s ease;
-}
-
-.hud-card:hover::before,
-.hud-card:hover::after {
-  opacity: 1;
-  filter: drop-shadow(0 0 4px #00D4FF);
-}
-
-/* Animation utilities */
+/* Simplified transitions */
 @keyframes fade-up {
   0% {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(4px);
   }
   100% {
     opacity: 1;
@@ -105,53 +58,28 @@ body {
   }
 }
 
-@keyframes pulse-dot {
+@keyframes pulse-subtle {
   0%, 100% {
     opacity: 1;
-    transform: scale(1);
   }
   50% {
-    opacity: 0.4;
-    transform: scale(0.8);
-  }
-}
-
-@keyframes sweep {
-  0% {
-    left: -150px;
-  }
-  100% {
-    left: 100%;
+    opacity: 0.5;
   }
 }
 
 .animate-fade-up {
-  animation: fade-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fade-up 0.3s ease-out forwards;
 }
 
-.animate-pulse-dot {
-  animation: pulse-dot 1.5s ease-in-out infinite;
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s ease-in-out infinite;
 }
 
-.animate-sweep {
-  animation: sweep 1.5s linear infinite;
+/* Simple hover border transitions */
+.hover-border-transition {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Glow styles */
-.glow-border-hover:hover {
-  border-color: rgba(0, 212, 255, 0.6);
-  box-shadow: 0 0 15px rgba(0, 212, 255, 0.15);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.glow-text-cyan {
-  text-shadow: 0 0 8px rgba(0, 212, 255, 0.6);
-}
-
-.glow-text-green {
-  text-shadow: 0 0 8px rgba(57, 255, 20, 0.6);
-}
-
-.glow-text-coral {
-  text-shadow: 0 0 8px rgba(255, 71, 87, 0.6);
+.hover-border-transition:hover {
+  border-color: #27272A;
 }
