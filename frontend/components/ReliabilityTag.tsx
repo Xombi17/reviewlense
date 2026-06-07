@@ -6,21 +6,14 @@ interface ReliabilityTagProps {
 
 export default function ReliabilityTag({ reliability }: ReliabilityTagProps) {
   const styles = {
-    HIGH: "bg-green-100 text-green-800 dark:bg-green-950/30 dark:text-green-400",
-    MEDIUM: "bg-yellow-100 text-yellow-900 dark:bg-yellow-950/30 dark:text-yellow-400",
-    LOW: "bg-red-100 text-red-800 dark:bg-red-950/30 dark:text-red-400"
-  };
-
-  const labels = {
-    HIGH: "High Reliability",
-    MEDIUM: "Medium Reliability",
-    LOW: "Low Reliability"
+    HIGH: "bg-[rgba(57,255,20,0.15)] text-accent-green border border-[rgba(57,255,20,0.3)]",
+    MEDIUM: "bg-[rgba(255,184,0,0.15)] text-accent-amber border border-[rgba(255,184,0,0.3)]",
+    LOW: "bg-[rgba(255,71,87,0.15)] text-accent-coral border border-[rgba(255,71,87,0.3)]",
   };
 
   return (
-    <div className={`rounded-full py-1 px-3 text-sm font-semibold w-fit hover:shadow transition-shadow duration-200 ${styles[reliability]}`}>
-      {labels[reliability]}
+    <div className={`rounded-full py-1 px-3.5 font-mono text-[10px] font-bold uppercase tracking-wider select-none w-fit ${styles[reliability]}`}>
+      {reliability} RELIABILITY
     </div>
   );
 }
-

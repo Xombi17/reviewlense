@@ -7,21 +7,21 @@ interface BatchSummaryProps {
 }
 
 export default function BatchSummary({ results }: BatchSummaryProps) {
-  const total = results.total;
   const processed = results.processed;
   const skipped = results.skipped;
   const suspicious = results.suspicious_count;
+  const confidence = `${Math.round(results.avg_confidence * 100)}%`;
 
   return (
-    <div>
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-        Analysis Summary
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="Total Reviews" value={total} />
-        <StatCard title="Successfully Processed" value={processed} unit="reviews" />
-        <StatCard title="Skipped / Invalid" value={skipped} unit="skipped" />
-        <StatCard title="Suspicious" value={suspicious} unit="flagged" />
+    <div className="flex flex-col gap-4 select-none">
+      <span className="font-mono text-[11px] text-muted-text uppercase tracking-widest">
+        Analysis Summary // SIGNAL READOUT
+      </span>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatCard title="Total Processed" value={processed.toLocaleString()} />
+        <StatCard title="Skipped Reviews" value={skipped.toLocaleString()} />
+        <StatCard title="Suspicious Count" value={suspicious.toLocaleString()} />
+        <StatCard title="Avg Confidence" value={confidence} />
       </div>
     </div>
   );

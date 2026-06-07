@@ -7,29 +7,32 @@ interface AspectChipsProps {
 
 export default function AspectChips({ aspects }: AspectChipsProps) {
   if (!aspects || aspects.length === 0) {
-    return <div className="text-gray-500 italic text-sm">No aspects detected</div>;
+    return <div className="text-muted-text font-mono text-[11px] uppercase">No aspects detected</div>;
   }
 
   return (
     <div className="flex flex-wrap gap-2">
       {aspects.map((aspect, idx) => {
         const isPositive = aspect.sentiment === 1;
+        const arrow = isPositive ? "↑" : "↓";
         return (
           <div 
             key={idx} 
-            tabIndex={0}
-            className={`rounded-lg py-2 px-3 text-sm flex flex-col items-start justify-center cursor-pointer transition-all duration-200 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+            className={`opacity-0 animate-fade-up backdrop-blur-[4px] rounded-[4px] py-1 px-3 text-[12px] font-mono font-medium flex items-center gap-1.5 border select-none transition-all duration-200 ${
               isPositive 
-                ? 'bg-green-100 text-green-900 hover:bg-green-200 dark:bg-green-950/30 dark:text-green-300 dark:hover:bg-green-900/40' 
-                : 'bg-red-100 text-red-900 hover:bg-red-200 dark:bg-red-950/30 dark:text-red-300 dark:hover:bg-red-900/40'
+                ? 'bg-[rgba(57,255,20,0.1)] text-accent-green border-[rgba(57,255,20,0.2)] hover:bg-[rgba(57,255,20,0.2)]' 
+                : 'bg-[rgba(255,71,87,0.1)] text-accent-coral border-[rgba(255,71,87,0.2)] hover:bg-[rgba(255,71,87,0.2)]'
             }`}
+            style={{ 
+              animationDelay: `${idx * 40}ms`,
+              animationFillMode: 'forwards'
+            }}
           >
-            <span className="font-semibold">{isPositive ? '📈' : '📉'} {aspect.aspect}</span>
-            <span className="text-gray-600 dark:text-gray-400 text-xs mt-0.5">{aspect.confidence.toFixed(2)}</span>
+            <span>{aspect.aspect}</span>
+            <span className="font-bold text-[13px]">{arrow}</span>
           </div>
         );
       })}
     </div>
   );
 }
-

@@ -44,18 +44,18 @@ export default function BatchPage() {
   };
 
   return (
-    <main className="max-w-7xl mx-auto px-4 py-8 flex flex-col gap-6">
-      {/* Page header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Batch Analysis
-        </h1>
-        <p className="text-gray-500 dark:text-gray-400 mt-1">
+    <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-8 select-none">
+      {/* Page Header */}
+      <div className="flex flex-col gap-1 border-b border-terminal-border/40 pb-4">
+        <div className="font-mono text-[13px] font-bold tracking-[0.2em] text-accent-cyan uppercase glow-text-cyan">
+          BATCH_SYSTEM // Uploader
+        </div>
+        <p className="font-sans text-[12px] text-muted-text uppercase tracking-wider">
           Upload a CSV file to analyze multiple reviews at once
         </p>
       </div>
 
-      {/* Upload zone — shown only when there are no results and not loading */}
+      {/* Upload Zone */}
       {!results && !isLoading && (
         <UploadZone
           onFileSelect={handleFileSelect}
@@ -65,42 +65,43 @@ export default function BatchPage() {
         />
       )}
 
-      {/* Loading skeleton */}
+      {/* Loading Radar Sweep */}
       {isLoading && <BatchSkeleton />}
 
-      {/* Results */}
+      {/* Results View */}
       {results && !isLoading && (
-        <>
-          {/* Summary cards */}
+        <div className="flex flex-col gap-8 animate-fade-up">
+          {/* Summary Cards Row */}
           <BatchSummary results={results} />
 
-          {/* Charts */}
+          {/* Charts Row */}
           <BatchCharts results={results} />
 
-          {/* Top reviews */}
+          {/* Complaints / Praised Aspect Chips Grid */}
           <TopReviewsList
             topComplaints={results.top_complaints}
             topPraised={results.top_praised}
           />
 
-          {/* Skipped reviews warning */}
+          {/* Warning Message Box for Skipped Rows */}
           {results.skipped > 0 && (
-            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 text-yellow-800 dark:text-yellow-300 text-sm">
-              ⚠️{" "}
-              <strong>{results.skipped}</strong> review(s) were skipped (empty
-              or invalid)
+            <div className="border border-accent-amber/40 bg-[rgba(255,184,0,0.08)] p-4 rounded-[4px] font-mono text-[12px] text-accent-amber flex items-center gap-2 select-text">
+              <span>⚠</span>
+              <span>
+                <strong>{results.skipped}</strong> input review record(s) skipped due to formatting anomalies or null content.
+              </span>
             </div>
           )}
 
-          {/* Upload Another File button */}
+          {/* Upload Another File Button */}
           <button
             onClick={handleReset}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-lg font-medium transition-colors"
+            className="w-full h-12 border border-terminal-border bg-terminal-card hover:bg-terminal-border/20 text-white font-mono text-[12px] font-bold uppercase tracking-[0.15em] rounded-[4px] mt-4 transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
           >
             Upload Another File
           </button>
-        </>
+        </div>
       )}
-    </main>
+    </div>
   );
 }

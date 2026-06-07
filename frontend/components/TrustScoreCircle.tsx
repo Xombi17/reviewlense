@@ -1,36 +1,62 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface TrustScoreCircleProps {
   score: number;
 }
 
 export default function TrustScoreCircle({ score }: TrustScoreCircleProps) {
-  const percentage = Math.max(0, Math.min(100, score * 100));
-  
-  let colorCode = "#16a34a"; // green-600
-  let textColorClass = "text-green-700 dark:text-green-400";
-  if (score < 0.5) {
-    colorCode = "#dc2626"; // red-600
-    textColorClass = "text-red-700 dark:text-red-400";
-  } else if (score < 0.75) {
-    colorCode = "#b45309"; // amber-700
-    textColorClass = "text-amber-800 dark:text-amber-400";
-  }
+  const [animatedScore, setAnimatedScore] = useState(0);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAnimatedScore(score);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [score]);
+
+  const radius = 32;
+  const strokeWidth = 3;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference - (animatedScore * circumference);
 
   return (
-    <div className="flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-200">
-      <div 
-        className="w-[100px] h-[100px] rounded-full flex items-center justify-center relative bg-gray-100 dark:bg-gray-800 shadow-sm"
-        style={{
-          background: `conic-gradient(${colorCode} ${percentage}%, #e5e7eb ${percentage}%)`
-        }}
-      >
-        <div className={`w-[84px] h-[84px] bg-white dark:bg-gray-900 rounded-full flex items-center justify-center flex-col ${textColorClass} z-10 shadow-inner`}>
-          <span className="text-xl font-bold leading-none">{score.toFixed(2)}</span>
+    <div className="flex flex-col items-center justify-center select-none font-mono">
+      <div className="relative w-24 h-24 flex items-center justify-center">
+        <svg className="w-full h-full transform -rotate-90">
+          {/* Background circle */}
+          <circle
+            cx="48"
+            cy="48"
+            r={radius}
+            fill="transparent"
+            stroke="#1E1E2E"
+            strokeWidth={strokeWidth}
+          />
+          {/* Progress circle */}
+          <circle
+            cx="48"
+            cy="48"
+            r={radius}
+            fill="transparent"
+            stroke="#00D4FF"
+            strokeWidth={strokeWidth}
+            strokeDasharray={circumference}
+            strokeDashoffset={strokeDashoffset}
+            strokeLinecap="round"
+            style={{ 
+              transition: 'stroke-dashoffset 800ms cubic-bezier(0.16, 1, 0.3, 1)',
+              filter: 'drop-shadow(0 0 3px rgba(0, 212, 255, 0.4))'
+            }}
+          />
+        </svg>
+        <div className="absolute flex flex-col items-center">
+          <span className="text-[20px] font-bold text-white tracking-tighter leading-none">
+            {score.toFixed(2)}
+          </span>
+          <span className="text-[9px] text-muted-text mt-0.5 font-mono">0.0 - 1.0</span>
         </div>
       </div>
-      <span className="text-xs text-gray-600 dark:text-gray-400 mt-2 font-medium">Trust Score</span>
+      <span className="text-[10px] text-muted-text uppercase tracking-widest mt-1">TRUST SCORE</span>
     </div>
   );
 }
-

@@ -40,45 +40,40 @@ export default function UploadZone({ onFileSelect, isLoading, error, onErrorDism
     }
   };
 
-  const containerClasses = [
-    "border-2 border-dashed rounded-lg p-6 md:p-8 lg:p-10 flex flex-col items-center justify-center gap-3 text-center cursor-pointer transition-all duration-200 focus-within:ring-2 focus-within:ring-blue-500",
-    isDragging
-      ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-      : "border-gray-300 dark:border-gray-600 hover:border-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/50",
-    isLoading ? "opacity-50 cursor-not-allowed" : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      onFileSelect(file);
+    }
+  };
 
   return (
-    <div className="flex flex-col gap-4 w-full">
+    <div className="flex flex-col gap-4 w-full select-none">
       {error && (
-        <div 
-          className="bg-red-50 dark:bg-red-950/20 text-red-900 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg p-4 flex items-center justify-between gap-4 font-medium transition-all"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <span className="text-sm md:text-base text-red-600 dark:text-red-400">{error}</span>
+        <div className="w-full border border-accent-coral/60 bg-[#1A0000] p-4 rounded-[4px] font-mono text-[12px] text-accent-coral flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span>⚠</span>
+            <span>{error}</span>
+          </div>
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onErrorDismiss?.();
-            }}
-            className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 focus:outline-none"
-            aria-label="Dismiss error"
+            onClick={onErrorDismiss}
+            className="text-accent-coral hover:text-white transition-colors duration-150 font-bold uppercase tracking-wider text-[10px]"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            DISMISS
           </button>
         </div>
       )}
       
       <div
-        className={containerClasses}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onClick={handleClick}
+        className={`group border-2 rounded-[4px] p-12 flex flex-col items-center justify-center gap-4 text-center cursor-pointer transition-all duration-300 min-h-[220px] ${
+          isDragging
+            ? "border-solid border-accent-cyan bg-accent-cyan/5 shadow-[0_0_15px_rgba(0,212,255,0.1)]"
+            : "border-dashed border-terminal-border bg-terminal-card hover:border-accent-cyan hover:shadow-[0_0_12px_rgba(0,212,255,0.08)]"
+        } ${isLoading ? "opacity-40 cursor-not-allowed" : ""}`}
       >
         {/* Hidden file input */}
         <input
@@ -90,40 +85,32 @@ export default function UploadZone({ onFileSelect, isLoading, error, onErrorDism
           onChange={handleFileChange}
         />
 
-        {/* Upload icon */}
-        <svg
-          className="w-12 h-12 md:w-16 md:h-16 text-gray-400 transition-colors"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+        {/* Grid/CSV Icon */}
+        <svg 
+          className="w-12 h-12 text-muted-text group-hover:text-accent-cyan transition-colors duration-300" 
+          fill="none" 
+          stroke="currentColor" 
+          viewBox="0 0 24 24" 
           xmlns="http://www.w3.org/2000/svg"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={1.5}
-            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+          <path 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+            strokeWidth={1.5} 
+            d="M3 10h18M3 14h18m-9-4v8m-5-8v8m10-8v8M4 6h16a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V7a1 1 0 011-1z" 
           />
         </svg>
 
         {/* Primary text */}
-        <p className="font-semibold text-gray-700 dark:text-gray-200 text-sm md:text-base">
-          Drag CSV here or click to browse
+        <p className="font-mono text-[13px] font-bold text-white uppercase tracking-wider group-hover:text-accent-cyan transition-colors duration-300">
+          Drop CSV here or click to upload
         </p>
 
-        {/* Hint text */}
-        <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
-          CSV must contain &ldquo;reviewText&rdquo; column • Max 5MB • Max 2000 rows
+        {/* Constraints in muted mono */}
+        <p className="font-mono text-[11px] text-muted-text">
+          Max 5MB · 2000 rows · requires reviewText column
         </p>
       </div>
     </div>
   );
-
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (file) {
-      onFileSelect(file);
-    }
-  }
 }
-

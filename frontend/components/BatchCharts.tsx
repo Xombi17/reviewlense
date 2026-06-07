@@ -1,122 +1,53 @@
 "use client";
 
 import React from "react";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-} from "recharts";
+import SentimentChart from "./SentimentChart";
+import ReliabilityChart from "./ReliabilityChart";
 import { BatchResponse } from "../lib/types";
 
 interface BatchChartsProps {
   results: BatchResponse;
 }
 
-const SENTIMENT_COLORS: Record<string, string> = {
-  positive: "#10b981",
-  negative: "#ef4444",
-};
-
-const RELIABILITY_COLORS: Record<string, string> = {
-  HIGH: "#10b981",
-  MEDIUM: "#f59e0b",
-  LOW: "#ef4444",
-};
-
 export default function BatchCharts({ results }: BatchChartsProps) {
-  // Transform sentiment_distribution: { positive: 120, negative: 80 } → [{ name, value }, ...]
-  const sentimentData = Object.entries(results.sentiment_distribution).map(
-    ([key, value]) => ({
-      name: key.charAt(0).toUpperCase() + key.slice(1),
-      value,
-      rawKey: key,
-    })
-  );
+  const positive = results.sentiment_distribution.positive ?? 0;
+  const negative = results.sentiment_distribution.negative ?? 0;
 
-  // Transform reliability_breakdown to percentages
-  const reliabilityRawTotal = Object.values(results.reliability_breakdown).reduce(
-    (sum, v) => sum + v,
-    0
-  );
+  // Extract counts for high, medium, low
+  const rawHigh = results.reliability_breakdown.HIGH ?? 0;
+  const rawMedium = results.reliability_breakdown.MEDIUM ?? 0;
+  const rawLow = results.reliability_breakdown.LOW ?? 0;
+  const rawTotal = rawHigh + rawMedium + rawLow;
 
-  const reliabilityData = Object.entries(results.reliability_breakdown).map(
-    ([key, value]) => ({
-      name: key,
-      value:
-        reliabilityRawTotal > 0
-          ? Math.round((value / reliabilityRawTotal) * 1000) / 10
-          : 0,
-    })
-  );
+  const highPct = rawTotal > 0 ? (rawHigh / rawTotal) * 100 : 0;
+  const mediumPct = rawTotal > 0 ? (rawMedium / rawTotal) * 100 : 0;
+  const lowPct = rawTotal > 0 ? (rawLow / rawTotal) * 100 : 0;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {/* Left: Sentiment Distribution PieChart */}
-      <div className="bg-white dark:bg-slate-900 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6">
-        <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 select-none">
+      
+      {/* Sentiment Chart Card */}
+      <div className="bg-terminal-card border border-terminal-border p-6 rounded-[4px] flex flex-col glow-border-hover transition-all duration-300">
+        <span className="font-mono text-[11px] text-muted-text uppercase tracking-widest border-b border-terminal-border/40 pb-3 mb-4">
           Sentiment Distribution
-        </h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <PieChart>
-            <Pie
-              data={sentimentData}
-              cx="50%"
-              cy="50%"
-              innerRadius={60}
-              outerRadius={90}
-              paddingAngle={5}
-              dataKey="value"
-            >
-              {sentimentData.map((entry, index) => (
-                <Cell
-                  key={`sentiment-cell-${index}`}
-                  fill={
-                    SENTIMENT_COLORS[entry.rawKey] ??
-                    (index % 2 === 0 ? "#10b981" : "#ef4444")
-                  }
-                />
-              ))}
-            </Pie>
-            <Tooltip formatter={(value: unknown, name: unknown) => [value as number, String(name)]} />
-            <Legend />
-          </PieChart>
-        </ResponsiveContainer>
+        </span>
+        <SentimentChart positive={positive} negative={negative} />
       </div>
 
-      {/* Right: Reliability Breakdown BarChart */}
-      <div className="bg-white dark:bg-slate-900 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6">
-        <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4">
+      {/* Reliability Breakdown Card */}
+      <div className="bg-terminal-card border border-terminal-border p-6 rounded-[4px] flex flex-col glow-border-hover transition-all duration-300 justify-between">
+        <span className="font-mono text-[11px] text-muted-text uppercase tracking-widest border-b border-terminal-border/40 pb-3 mb-4">
           Reliability Breakdown
-        </h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart
-            data={reliabilityData}
-            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-          >
-            <XAxis dataKey="name" />
-            <YAxis domain={[0, 100]} unit="%" />
-            <Tooltip
-              cursor={{ fill: "transparent" }}
-              formatter={(value: unknown) => [`${value}%`, "Percentage"]}
-            />
-            <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-              {reliabilityData.map((entry, index) => (
-                <Cell
-                  key={`reliability-cell-${index}`}
-                  fill={RELIABILITY_COLORS[entry.name] ?? "#9ca3af"}
-                />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+        </span>
+        <div className="flex-1 flex items-center justify-center">
+          <ReliabilityChart
+            high={highPct}
+            medium={mediumPct}
+            low={lowPct}
+          />
+        </div>
       </div>
+
     </div>
   );
 }

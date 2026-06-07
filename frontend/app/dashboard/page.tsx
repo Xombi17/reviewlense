@@ -8,7 +8,6 @@ import StatCard from "../../components/StatCard";
 import SentimentChart from "../../components/SentimentChart";
 import ModelTable from "../../components/ModelTable";
 import ReliabilityChart from "../../components/ReliabilityChart";
-import FailureTypesChart from "../../components/FailureTypesChart";
 import DashboardSkeleton from "../../components/DashboardSkeleton";
 
 export default function DashboardPage() {
@@ -24,7 +23,6 @@ export default function DashboardPage() {
       setStats(data);
     } catch (err: any) {
       setError("Failed to load dashboard. Please refresh the page.");
-      // Keep old stats if we have them to avoid sudden blank page
     } finally {
       setIsLoading(false);
     }
@@ -35,36 +33,47 @@ export default function DashboardPage() {
   }, []);
 
   const totalReviews = stats?.dataset_summary.total_reviews ?? 0;
-  const positivePercentage = totalReviews > 0 ? ((stats?.dataset_summary.positive_count ?? 0) / totalReviews) * 100 : 0;
-  const negativePercentage = totalReviews > 0 ? ((stats?.dataset_summary.negative_count ?? 0) / totalReviews) * 100 : 0;
+  const avgConfidence = stats?.avg_confidence 
+    ? `${Math.round(stats.avg_confidence * 100)}%` 
+    : "0%";
+  const highReliability = stats?.reliability_summary.high_confidence_percentage 
+    ? `${Math.round(stats.reliability_summary.high_confidence_percentage)}%` 
+    : "0%";
+  const datasetSource = stats?.dataset_summary.source 
+    ? stats.dataset_summary.source.split(" ")[2] || "AMAZON"
+    : "N/A";
+
+  const failureModes = [
+    { category: "MIXED_SENTIMENT", example: "The camera is nice but the app crashes constantly and battery life is completely [REDACTED]." },
+    { category: "SARCASM", example: "Oh fantastic, another charger that broke after exactly two days of light use." },
+    { category: "COMPARATIVE", example: "It has slightly better sound than my old pair, but is nowhere near as [REDACTED]." },
+    { category: "SHORT_REVIEW", example: "Terrible." },
+    { category: "NEGATION_FAILURE", example: "I don't dislike the design but I cannot say it is worth the high price." }
+  ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col gap-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
-        <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">Model Performance & Dataset Overview</p>
+    <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-8 select-none">
+      
+      {/* Title section */}
+      <div className="flex flex-col gap-1 border-b border-terminal-border/40 pb-4">
+        <div className="font-mono text-[13px] font-bold tracking-[0.2em] text-accent-cyan uppercase glow-text-cyan">
+          SYSTEM_METRICS // DASHBOARD
+        </div>
+        <p className="font-sans text-[12px] text-muted-text uppercase tracking-wider">Model Performance & Dataset Overview</p>
       </div>
 
       {error && (
-        <div className="bg-red-50 dark:bg-red-950/20 text-red-900 dark:text-red-400 border border-red-200 dark:border-red-800 p-4 rounded-lg flex items-center justify-between gap-4 font-medium transition-all duration-300">
-          <span>{error}</span>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={fetchStats}
-              className="px-3 py-1.5 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-            >
-              Refresh
-            </button>
-            <button
-              onClick={() => setError(null)}
-              className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 focus:outline-none"
-              aria-label="Dismiss error"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+        <div className="w-full border border-accent-coral/60 bg-[#1A0000] p-4 rounded-[4px] font-mono text-[12px] text-accent-coral flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span>⚠</span>
+            <span>{error}</span>
           </div>
+          <button
+            onClick={fetchStats}
+            className="px-3 py-1 bg-accent-coral text-black font-mono text-[10px] font-bold uppercase tracking-wider rounded-[3px] hover:brightness-105"
+          >
+            RETRY
+          </button>
         </div>
       )}
 
@@ -72,40 +81,48 @@ export default function DashboardPage() {
         <DashboardSkeleton />
       ) : stats ? (
         <>
-          {/* Stat Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          {/* Stat Cards Grid (3-column layout) */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <StatCard
               title="Total Reviews"
-              value={stats.dataset_summary.total_reviews}
-              unit="reviews"
+              value={totalReviews.toLocaleString()}
             />
             <StatCard
-              title="Positive"
-              value={stats.dataset_summary.positive_count}
-              unit={`(${positivePercentage.toFixed(2)}%)`}
+              title="Avg Confidence"
+              value={avgConfidence}
             />
             <StatCard
-              title="Negative"
-              value={stats.dataset_summary.negative_count}
-              unit={`(${negativePercentage.toFixed(2)}%)`}
+              title="High Reliability"
+              value={highReliability}
             />
-            <StatCard 
-              title="Dataset Source"
-              value={stats.dataset_summary.source}
-            />
+            <div className="md:col-span-3 lg:col-span-1">
+              <StatCard 
+                title="Dataset Source"
+                value={datasetSource}
+              />
+            </div>
           </div>
 
-          {/* Charts Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white dark:bg-slate-900 rounded-lg p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Sentiment Distribution</h2>
-              <div className="w-full h-[300px] md:h-[400px]">
-                <SentimentChart positive={stats.dataset_summary.positive_count} negative={stats.dataset_summary.negative_count} />
-              </div>
+          {/* Charts Section (2-column layout) */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-2">
+            
+            {/* Sentiment Chart Card */}
+            <div className="bg-terminal-card border border-terminal-border p-6 rounded-[4px] flex flex-col glow-border-hover transition-all duration-300">
+              <span className="font-mono text-[11px] text-muted-text uppercase tracking-widest border-b border-terminal-border/40 pb-3 mb-4">
+                Sentiment Distribution
+              </span>
+              <SentimentChart 
+                positive={stats.dataset_summary.positive_count} 
+                negative={stats.dataset_summary.negative_count} 
+              />
             </div>
-            <div className="bg-white dark:bg-slate-900 rounded-lg p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Reliability Breakdown</h2>
-              <div className="w-full h-[300px] md:h-[400px]">
+
+            {/* Reliability Breakdown Card */}
+            <div className="bg-terminal-card border border-terminal-border p-6 rounded-[4px] flex flex-col glow-border-hover transition-all duration-300 justify-between">
+              <span className="font-mono text-[11px] text-muted-text uppercase tracking-widest border-b border-terminal-border/40 pb-3 mb-4">
+                Reliability Breakdown
+              </span>
+              <div className="flex-1 flex items-center justify-center">
                 <ReliabilityChart
                   high={stats.reliability_summary.high_confidence_percentage}
                   medium={stats.reliability_summary.medium_confidence_percentage}
@@ -113,21 +130,46 @@ export default function DashboardPage() {
                 />
               </div>
             </div>
+
           </div>
 
-          {/* Model Comparison */}
-          <div className="bg-white dark:bg-slate-900 rounded-lg p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Model Comparison</h2>
-            <div className="overflow-x-auto">
-              <ModelTable models={stats.models} />
-            </div>
+          {/* Model Comparison Table */}
+          <div className="flex flex-col gap-4 mt-2">
+            <span className="font-mono text-[11px] text-muted-text uppercase tracking-widest">
+              Model Evaluation Matrix
+            </span>
+            <ModelTable models={stats.models} />
           </div>
 
-          {/* Failure Analysis */}
-          <div className="bg-white dark:bg-slate-900 rounded-lg p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Failure Type Analysis</h2>
-            <div className="w-full h-[300px] md:h-[400px]">
-              <FailureTypesChart failureTypes={stats.failure_modes} />
+          {/* Redacted Failure Modes Section */}
+          <div className="bg-terminal-card border border-terminal-border p-6 rounded-[4px] flex flex-col gap-4 mt-2 glow-border-hover transition-all duration-300 select-text">
+            <span className="font-mono text-[11px] text-muted-text uppercase tracking-widest border-b border-terminal-border/40 pb-3">
+              MODEL FAILURE MODES
+            </span>
+            
+            <div className="flex flex-col border border-terminal-border rounded-[4px] overflow-hidden font-mono text-[12px]">
+              
+              {/* Header row */}
+              <div className="grid grid-cols-3 bg-terminal-border/20 px-4 py-2 text-[10px] font-bold text-muted-text uppercase tracking-widest border-b border-terminal-border">
+                <div className="col-span-1">Category</div>
+                <div className="col-span-2">Redacted Scenario Example</div>
+              </div>
+
+              {/* Data rows */}
+              {failureModes.map((fm, idx) => (
+                <div 
+                  key={idx} 
+                  className="grid grid-cols-3 px-4 py-3 border-b border-terminal-border last:border-0 hover:bg-[#1A1A2E]/70 transition-colors duration-150 items-center"
+                >
+                  <div className="col-span-1 font-bold text-accent-cyan tracking-wider">
+                    {fm.category}
+                  </div>
+                  <div className="col-span-2 text-body-text italic">
+                    "{fm.example}"
+                  </div>
+                </div>
+              ))}
+
             </div>
           </div>
         </>

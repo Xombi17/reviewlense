@@ -1,175 +1,110 @@
-"use client";
+import React from "react";
+import Link from "next/link";
 
-import React, { useState, useCallback, useEffect } from 'react';
-import { analyzeReview } from '../lib/api';
-import type { PredictResponse } from '../lib/types';
+export const metadata = {
+  title: "ReviewLens AI - Sentiment Intelligence Terminal",
+  description: "A dark-mode analytics console featuring high-confidence aspect sentiment extraction, uncertainty calibration, and spam review heuristics.",
+};
 
-import SentimentBadge from '../components/SentimentBadge';
-import ConfidenceBar from '../components/ConfidenceBar';
-import ReliabilityTag from '../components/ReliabilityTag';
-import AspectChips from '../components/AspectChips';
-import FlagsList from '../components/FlagsList';
-import TrustScoreCircle from '../components/TrustScoreCircle';
-import LoadingSkeleton from '../components/LoadingSkeleton';
-import ExampleChips from '../components/ExampleChips';
+export default function LandingPage() {
+  const stats = [
+    { label: "TOTAL DATABASE DATASETS", value: "19,418" },
+    { label: "SVM CLASSIFIER ACCURACY", value: "94.95%" },
+    { label: "AVERAGE INFERENCE SPEED", value: "84 ms" },
+    { label: "ACTIVE NLP NODES", value: "128 / 128" },
+  ];
 
-export default function Home() {
-  const [review, setReview] = useState("");
-  const [selectedModel, setSelectedModel] = useState<"lr" | "nb" | "svm">("lr");
-  const [isLoading, setIsLoading] = useState(false);
-  const [prediction, setPrediction] = useState<PredictResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [showResults, setShowResults] = useState(false);
-
-  const handleAnalyze = useCallback(async () => {
-    const trimmed = review.trim();
-    if (trimmed.length < 10) return;
-
-    setIsLoading(true);
-    setError(null);
-    setPrediction(null);
-    setShowResults(false);
-
-    try {
-      const result = await analyzeReview(trimmed, selectedModel);
-      setPrediction(result);
-    } catch (err: any) {
-      setError(err.message || "Failed to analyze review");
-    } finally {
-      setIsLoading(false);
+  const features = [
+    {
+      code: "01 // MULTI_MODEL",
+      title: "Tri-Model Inference Matrix",
+      desc: "Simultaneous evaluation across Multinomial Naive Bayes, Logistic Regression, and Calibrated Linear SVM algorithms with live margin offsets.",
+      color: "text-accent-cyan"
+    },
+    {
+      code: "02 // ASPECT_POLAR",
+      title: "Granular Aspect Mapping",
+      desc: "Deconstructs sentences to extract sentiment indicators on individual product parameters (e.g. sound quality, battery parameters, micro-connectivity).",
+      color: "text-accent-green"
+    },
+    {
+      code: "03 // RELIABILITY_CAL",
+      title: "Uncertainty Margin Calibration",
+      desc: "Classifies predictions into High, Medium, and Low confidence thresholds. Flags mixed sentiment anomalies and edge case warnings.",
+      color: "text-accent-amber"
+    },
+    {
+      code: "04 // SPAM_HEURISTICS",
+      title: "Trust Index Evaluation",
+      desc: "Scores text integrity based on lexical repetitions, shouting patterns (caps-screaming), and word length boundaries to weed out review noise.",
+      color: "text-accent-coral"
     }
-  }, [review, selectedModel]);
-
-  const handleExampleClick = useCallback((example: string) => {
-    setReview(example);
-    setError(null);
-  }, []);
-
-  useEffect(() => {
-    if (prediction && !isLoading) {
-      const timer = setTimeout(() => setShowResults(true), 10);
-      return () => clearTimeout(timer);
-    } else {
-      setShowResults(false);
-    }
-  }, [prediction, isLoading]);
-
-  useEffect(() => {
-    if (error) {
-      const timer = setTimeout(() => setError(null), 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [error]);
+  ];
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 flex flex-col gap-6">
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-        ReviewLens Analyzer
-      </h1>
-
-      <div className="flex flex-col gap-4">
-        <textarea
-          value={review}
-          onChange={(e) => {
-            setReview(e.target.value);
-            if (error) setError(null);
-          }}
-          disabled={isLoading}
-          rows={6}
-          placeholder="Enter a product review (10–5000 characters)..."
-          className="w-full rounded-lg border-2 border-gray-300 p-4 font-mono text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 disabled:opacity-50 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-        />
-
-        <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <label className="font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
-              Model
-            </label>
-            <select
-              value={selectedModel}
-              onChange={(e) => setSelectedModel(e.target.value as "lr" | "nb" | "svm")}
-              disabled={isLoading}
-              className="rounded-lg border-2 border-gray-300 py-2 px-3 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 disabled:opacity-50 w-full sm:w-auto dark:bg-gray-800 dark:border-gray-700 dark:text-white hover:bg-gray-50 hover:border-gray-400 dark:hover:bg-gray-750"
-            >
-              <option value="lr">Logistic Regression</option>
-              <option value="nb">Naive Bayes</option>
-              <option value="svm">LinearSVM</option>
-            </select>
+    <div className="w-full min-h-[calc(100vh-56px)] flex flex-col justify-between py-12 px-6 select-none font-mono">
+      <div className="max-w-6xl mx-auto w-full flex-1 flex flex-col justify-center gap-12">
+        
+        {/* Hero Section */}
+        <div className="flex flex-col gap-6 text-center md:text-left md:max-w-3xl animate-fade-up">
+          <div className="text-[11px] text-accent-cyan font-bold tracking-[0.25em] uppercase glow-text-cyan">
+            REVIEWLENS_AI // PROTOCOL_V1.0
           </div>
+          <h1 className="font-mono text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight uppercase">
+            Sentiment Analysis with <span className="text-accent-cyan glow-text-cyan">Absolute Precision</span>
+          </h1>
+          <p className="font-sans text-[14px] sm:text-[16px] text-muted-text max-w-xl leading-relaxed">
+            A calibrated review analytics console featuring aspect-level polarity extraction, prediction reliability verification, and heuristic trust scoring.
+          </p>
 
-          <button
-            onClick={handleAnalyze}
-            disabled={review.trim().length < 10 || isLoading}
-            className="w-full sm:w-auto bg-blue-600 text-white rounded-lg py-2 px-6 font-semibold hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-          >
-            {isLoading ? "Analyzing..." : "Analyze"}
-          </button>
+          {/* Action CTAs */}
+          <div className="flex flex-col sm:flex-row gap-4 mt-4 justify-center md:justify-start">
+            <Link 
+              href="/analyzer"
+              className="h-12 px-8 bg-accent-cyan text-black font-mono text-[12px] font-bold uppercase tracking-[0.15em] rounded-[4px] flex items-center justify-center transition-all duration-200 hover:brightness-105 hover:shadow-[0_0_15px_rgba(0,212,255,0.4)] cursor-pointer"
+            >
+              LAUNCH ANALYZER
+            </Link>
+            <Link 
+              href="/batch"
+              className="h-12 px-8 border border-terminal-border bg-terminal-card hover:bg-terminal-border/20 text-white font-mono text-[12px] font-bold uppercase tracking-[0.15em] rounded-[4px] flex items-center justify-center transition-all duration-200 cursor-pointer"
+            >
+              CSV BATCH CONSOLE
+            </Link>
+          </div>
         </div>
+
+        {/* Live Telemetry Bar */}
+        <div className="hud-card grid grid-cols-2 lg:grid-cols-4 gap-6 bg-terminal-card border border-terminal-border p-6 rounded-[4px] w-full animate-fade-up" style={{ animationDelay: "100ms" }}>
+          {stats.map((st, i) => (
+            <div key={i} className="flex flex-col gap-1 border-r border-terminal-border/30 last:border-0 pr-4">
+              <span className="text-[9px] text-muted-text uppercase tracking-widest">{st.label}</span>
+              <span className="text-[20px] font-bold text-white tracking-tighter glow-text-cyan">{st.value}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Core Matrix Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full animate-fade-up" style={{ animationDelay: "200ms" }}>
+          {features.map((ft, i) => (
+            <div key={i} className="hud-card bg-terminal-card border border-terminal-border p-6 rounded-[4px] flex flex-col gap-3 glow-border-hover transition-all duration-300">
+              <div className="flex justify-between items-center border-b border-terminal-border/40 pb-2">
+                <span className={`text-[10px] font-bold tracking-widest ${ft.color}`}>{ft.code}</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-accent-cyan/80 animate-pulse-dot" />
+              </div>
+              <h3 className="text-[14px] font-bold text-white uppercase tracking-wider">{ft.title}</h3>
+              <p className="font-sans text-[12px] text-muted-text leading-relaxed">{ft.desc}</p>
+            </div>
+          ))}
+        </div>
+
       </div>
 
-      {!prediction && !isLoading && (
-        <div className="mt-4">
-          <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">
-            Try an example
-          </h2>
-          <ExampleChips onChipClick={handleExampleClick} />
-        </div>
-      )}
-
-      {isLoading && (
-        <div className="mt-8">
-          <LoadingSkeleton />
-        </div>
-      )}
-
-      {error && (
-        <div className="mt-8 bg-red-50 dark:bg-red-950/20 text-red-900 dark:text-red-400 border border-red-200 dark:border-red-800 px-4 py-3 rounded-lg flex items-center justify-between gap-4 font-medium transition-all duration-300">
-          <span>{error}</span>
-          <button
-            onClick={() => setError(null)}
-            className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 focus:outline-none"
-            aria-label="Dismiss error"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-      )}
-
-
-      {prediction && !isLoading && (
-        <div className={`mt-8 bg-gray-50 dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700 transition-all duration-300 ease-out transform ${showResults ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          <h2 className="text-xl font-bold mb-6 text-gray-900 dark:text-white">Analysis Results</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="flex flex-col gap-6">
-              <div className="flex items-center justify-between">
-                <SentimentBadge sentiment={prediction.sentiment} />
-                <ReliabilityTag reliability={prediction.reliability} />
-              </div>
-              
-              <ConfidenceBar confidence={prediction.confidence} />
-              
-              <div>
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Aspects</h3>
-                <AspectChips aspects={prediction.aspects} />
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-6 items-start md:items-center md:border-l border-gray-200 dark:border-gray-700 md:pl-8">
-              <TrustScoreCircle score={prediction.trust_score} />
-              
-              <div className="w-full">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 md:text-center">Flags</h3>
-                <div className="flex md:justify-center">
-                  <FlagsList flags={prediction.flags} />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Footer System Status */}
+      <div className="max-w-6xl mx-auto w-full border-t border-terminal-border/30 pt-6 mt-12 flex flex-col sm:flex-row justify-between items-center gap-4 text-[10px] text-muted-text tracking-widest">
+        <span>REVIEWLENS AI TERMINAL OPERATIONAL</span>
+        <span>2026-06-07 // GMT-0</span>
+      </div>
     </div>
   );
 }

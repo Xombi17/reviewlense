@@ -1,14 +1,7 @@
 "use client";
 
 import React from "react";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 interface SentimentChartProps {
   positive: number;
@@ -17,43 +10,56 @@ interface SentimentChartProps {
 
 export default function SentimentChart({ positive, negative }: SentimentChartProps) {
   const total = positive + negative;
-  const positivePercentage = total > 0 ? ((positive / total) * 100).toFixed(1) : 0;
-  const negativePercentage = total > 0 ? ((negative / total) * 100).toFixed(1) : 0;
-
   const data = [
-    { name: "Positive", value: positive, percentage: positivePercentage },
-    { name: "Negative", value: negative, percentage: negativePercentage },
+    { name: "POSITIVE", value: positive },
+    { name: "NEGATIVE", value: negative },
   ];
 
-  const COLORS = ["#10b981", "#ef4444"]; // Green and Red
+  const COLORS = ["#39FF14", "#FF4757"];
 
   return (
-    <div style={{ width: "100%", height: 300 }}>
+    <div className="relative w-full h-[300px] flex items-center justify-center font-mono">
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
             data={data}
             cx="50%"
             cy="50%"
-            innerRadius={60}
-            outerRadius={80}
-            paddingAngle={5}
+            innerRadius={65}
+            outerRadius={85}
+            paddingAngle={4}
             dataKey="value"
-            label={(props: any) => `${props.payload.percentage}%`}
+            stroke="#111118"
+            strokeWidth={2}
           >
             {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              <Cell 
+                key={`cell-${index}`} 
+                fill={COLORS[index]} 
+                style={{ filter: `drop-shadow(0 0 3px ${COLORS[index]}33)` }}
+              />
             ))}
           </Pie>
-          <Tooltip 
-            formatter={(value: any, name: any, props: any) => [
-              `${value} (${props.payload.percentage}%)`, 
-              name
-            ]} 
-          />
-          <Legend />
         </PieChart>
       </ResponsiveContainer>
+
+      {/* Center label: total count in mono */}
+      <div className="absolute flex flex-col items-center justify-center select-none pointer-events-none">
+        <span className="text-[28px] font-bold text-white tracking-tighter leading-none">
+          {total}
+        </span>
+        <span className="text-[9px] text-muted-text uppercase tracking-widest mt-1">TOTAL</span>
+      </div>
+
+      {/* Custom Legend (No legend icons — use colored mono text labels only) */}
+      <div className="absolute bottom-1 flex justify-center gap-6 text-[10px] font-bold tracking-wider select-none">
+        <div className="text-accent-green">
+          POSITIVE: {positive}
+        </div>
+        <div className="text-accent-coral">
+          NEGATIVE: {negative}
+        </div>
+      </div>
     </div>
   );
 }
