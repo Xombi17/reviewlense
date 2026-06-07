@@ -1,64 +1,12 @@
 #!/bin/bash
 
-# Script to run backend, frontend, and model services in separate terminals
+# Script to run backend, frontend, and model services
 
 # Colors for output
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
-
-# Function to detect available terminal emulator
-detect_terminal() {
-    if command -v gnome-terminal &> /dev/null; then
-        echo "gnome-terminal"
-    elif command -v konsole &> /dev/null; then
-        echo "konsole"
-    elif command -v xterm &> /dev/null; then
-        echo "xterm"
-    elif command -v mate-terminal &> /dev/null; then
-        echo "mate-terminal"
-    elif command -v terminator &> /dev/null; then
-        echo "terminator"
-    else
-        echo ""
-    fi
-}
-
-# Function to run command in new terminal window
-run_in_terminal() {
-    local title="$1"
-    local cmd="$2"
-    local term=$(detect_terminal)
-
-    if [ -z "$term" ]; then
-        echo -e "${YELLOW}No graphical terminal found. Running '$cmd' in background.${NC}"
-        eval "$cmd &"
-        return
-    fi
-
-    case "$term" in
-        "gnome-terminal")
-            gnome-terminal --title="$title" -- bash -c "$cmd; exec bash"
-            ;;
-        "konsole")
-            konsole --title "$title" -e bash -c "$cmd; exec bash"
-            ;;
-        "xterm")
-            xterm -title "$title" -e bash -c "$cmd; exec bash"
-            ;;
-        "mate-terminal")
-            mate-terminal --title="$title" -- bash -c "$cmd; exec bash"
-            ;;
-        "terminator")
-            terminator --title="$title" -e bash -c "$cmd; exec bash"
-            ;;
-        *)
-            echo -e "${YELLOW}Unsupported terminal: $term. Running '$cmd' in background.${NC}"
-            eval "$cmd &"
-            ;;
-    esac
-}
 
 # Get the directory of this script
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -79,17 +27,61 @@ if [ ! -d "$FRONTEND_DIR" ]; then
     exit 1
 fi
 
-# Run Backend (FastAPI/Uvicorn)
+# Check if backend virtual environment exists
+VENV_DIR="$BACKEND_DIR/.venv"
+if [ ! -d "$VENV_DIR" ]; then
+    echo -e "${RED}Virtual environment not found: $VENV_DIR${NC}"
+    exit 1
+fi
+
+# Create logs directory
+LOGS_DIR="$PROJECT_DIR/logs"
+mkdir -p "$LOGS_DIR"
+
+# Run Backend (FastAPI/Uvicorn) with virtual environment in background
 echo -e "${YELLOW}Starting Backend...${NC}"
-run_in_terminal "ReviewLens Backend" "cd '$BACKEND_DIR' && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+cd "$BACKEND_DIR"
+source .venv/bin/activate
+nohup uvicorn main:app --host 0.0.0.0 --port 8000 --reload > "$LOGS_DIR/backend.log" 2>&1 &
+BACKEND_PID=$!
+echo -e "${YELLOW}Backend started with PID: $BACKEND_PID${NC}"
+deactivate
 
-# Run Frontend (Next.js)
+# Run Frontend (Next.js) in background
 echo -e "${YELLOW}Starting Frontend...${NC}"
-run_in_terminal "ReviewLens Frontend" "cd '$FRONTEND_DIR' && npm run dev"
+cd "$FRONTEND_DIR"
+nohup npm run dev > "$LOGS_DIR/frontend.log" 2>&1 &
+FRONTEND_PID=$!
+echo -e "${YELLOW}Frontend started with PID: $FRONTEND_PID${NC}"
 
-# Note: Model files are loaded by the backend on startup, so no separate process needed for models
+# Save PIDs to a file for easy cleanup
+echo "$BACKEND_PID $FRONTEND_PID" > "$PROJECT_DIR/service.pids"
 
-echo -e "${GREEN}All services have been started!${NC}"
+echo -e "${GREEN}All services started in background!${NC}"
 echo -e "${YELLOW}Backend should be available at http://localhost:8000${NC}"
 echo -e "${YELLOW}Frontend should be available at http://localhost:3000${NC}"
-echo -e "${YELLOW}Check the terminal windows for logs and output.${NC}"
+echo -e "${YELLOW}Logs are stored in: $LOGS_DIR${NC}"
+echo -e "${YELLOW}To stop services, run: ./stop_services.sh${NC}"
+
+# Create stop script
+cat > "$PROJECT_DIR/stop_services.sh" << EOF
+#!/bin/bash
+PROJECT_DIR="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")" && pwd)"
+PID_FILE="\$PROJECT_DIR/service.pids"
+
+if [ -f "\$PID_FILE" ]; then
+    read -r BACKEND_PID FRONTEND_PID < "\$PID_FILE"
+    echo "Stopping backend (PID: \$BACKEND_PID)..."
+    kill \$BACKEND_PID 2>/dev/null || echo "Backend process not found"
+    echo "Stopping frontend (PID: \$FRONTEND_PID)..."
+    kill \$FRONTEND_PID 2>/dev/null || echo "Frontend process not found"
+    rm -f "\$PID_FILE"
+    echo "Services stopped."
+else
+    echo "No PID file found. Services may not be running."
+fi
+EOF
+
+chmod +x "$PROJECT_DIR/stop_services.sh"
+
+echo -e "${YELLOW}A stop script has been created: stop_services.sh${NC}"

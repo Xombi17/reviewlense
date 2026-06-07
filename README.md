@@ -1,6 +1,39 @@
 # ReviewLens AI
 
-ReviewLens AI is a full-stack web application designed for sentiment analysis and aspect-based review insight extraction from product reviews. Built as an end-to-end system, it integrates a machine learning pipeline (featuring Naive Bayes, Logistic Regression, and SVM classifiers) with a FastAPI backend and a responsive Next.js 16 frontend. The application focuses on model reliability, uncertainty flagging, aspect extraction, and review trust analysis, making it an excellent tool for understanding customer feedback in depth.
+ReviewLens AI is a comprehensive, full-stack web application designed for sentiment analysis and aspect-based review insight extraction from product reviews. Built as an end-to-end system, it integrates a machine learning pipeline with a FastAPI backend and a responsive Next.js 16 frontend. The application focuses on model reliability, uncertainty flagging, aspect extraction, and review trust analysis, making it a powerful tool for understanding customer feedback in depth.
+
+By analyzing customer reviews, the platform extracts underlying sentiments, evaluates specific product features (aspects), calculates a heuristic trust score to filter potential spam, and flags low-confidence predictions.
+
+---
+
+## 🌟 Key Features
+
+* **Multi-Model Sentiment Classification**: Includes Multinomial Naive Bayes, Logistic Regression, and Calibrated Linear Support Vector Machine (SVM) models trained on real product reviews.
+* **Uncertainty & Reliability Flagging**: Estimates prediction confidence and classifies outcomes into High, Medium, and Low reliability tiers, flagging low-confidence results.
+* **Aspect-Based Sentiment Extraction**: Extracts mentions of specific product aspects (e.g., battery, sound, comfort, build quality, connectivity, delivery, price, microphone) and determines sentiment on a sentence-by-sentence basis.
+* **Review Trust Analysis**: Evaluates the integrity of reviews using heuristic rules to apply penalties for suspicious patterns (caps shouting, word repetition, excessive exclamation marks, and short length).
+* **Interactive Dashboards**: Features a user-friendly single-review analyzer and a batch CSV processing interface complete with charts and lists of top compliments and complaints.
+
+---
+
+## 🏗️ System Architecture & Data Pipeline
+
+When a user submits a review, the text is preprocessed and vectorized using TF-IDF before passing through the prediction models:
+
+```mermaid
+graph TD
+    A[Raw Review Text] --> B[HTML & URL Removal]
+    B --> C[Contraction Expansion]
+    C --> D[Tokenization & Lemmatization]
+    D --> E[Stopword Removal *Retaining Negations*]
+    E --> F[TF-IDF Vectorizer]
+    F --> G[Sentiment Predictor]
+    G --> H[Aspect Extractor]
+    G --> I[Trust & Suspicious Review Analyzer]
+    H --> J[JSON Response / Interactive Dashboard]
+    I --> J
+    G --> J
+```
 
 ---
 
@@ -8,108 +41,62 @@ ReviewLens AI is a full-stack web application designed for sentiment analysis an
 
 | Component | Technology | Version | Purpose |
 | :--- | :--- | :--- | :--- |
-| **Backend** | FastAPI | `0.111.0` | High-performance asynchronous REST API |
+| **Backend Framework** | FastAPI | `0.111.0` | High-performance asynchronous REST API |
 | **Backend Server** | Uvicorn | `0.29.0` | ASGI server implementation |
 | **Machine Learning** | scikit-learn | `1.5.0` | ML modeling (Naive Bayes, LR, SVM) |
 | **Data Processing** | pandas | `2.2.2` | Data manipulation and preprocessing |
 | **Data Processing** | numpy | `1.26.4` | Numerical array operations |
-| **NLP** | NLTK | `3.8.1` | Tokenization, stopwords, lemmatization |
-| **Frontend** | Next.js (App Router) | `16.x` | Modern React framework |
+| **NLP Library** | NLTK | `3.8.1` | Tokenization, stopwords, lemmatization |
+| **Frontend Framework** | Next.js (App Router) | `16.x` | Modern React framework |
 | **Styling** | Tailwind CSS | `v3` | Utility-first CSS styling |
 | **Visualizations** | Recharts | `Latest` | Interactive data charts and graphs |
 
 ---
 
-## 📋 Prerequisites
+## 📖 Project Documentation
 
-To run this project locally, ensure you have the following installed:
-- **Python**: version `3.10` or higher
-- **Node.js**: version `18` or higher
-- **NPM**: package manager (typically bundled with Node.js)
+For step-by-step guides and detailed reference manuals, please refer to the following files:
+
+* **[User Guide](file:///home/varad/Documents/himshikhar/mini-project1/docs/user-guide.md)**: Details on navigating the Next.js web application, analyzing reviews, uploading batch CSVs, understanding trust penalties (length, exclamation, shouting, repetition), and review examples.
+* **[Developer Setup & ML Guide](file:///home/varad/Documents/himshikhar/mini-project1/docs/developer-guide.md)**: Comprehensive guide to setting up and running backend/frontend development servers locally, dataset characteristics, NLP cleaning steps, training pipeline execution, and model failure modes.
+* **[API Reference](file:///home/varad/Documents/himshikhar/mini-project1/docs/api-reference.md)**: Full endpoint reference for `/predict`, `/batch`, and `/stats`, detailing JSON payloads, parameter schemas, and error responses.
+* **[Demo Video Scripts](file:///home/varad/Documents/himshikhar/mini-project1/docs/demo-scripts.md)**: Timecoded, speaker-prompted, two-part video scripts for recording end-user walkthroughs and developer setup walkthroughs.
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Quick Start (Development Mode)
 
-### 1. Clone the Repository
+### 1. Start the Backend API
+Navigate to `/backend` directory, activate virtual environment, and run:
 ```bash
-git clone <repository-url>
-cd mini-project1
-```
-
-### 2. Backend Setup & Run
-
-Create a virtual environment, install the required packages, and start the development server:
-
-```bash
-# Create a virtual environment
-python -m venv venv
-
-# Activate the virtual environment
-# On Linux/macOS:
-source venv/bin/activate
-# On Windows:
-# .\venv\Scripts\activate
-
-# Install dependencies
 cd backend
-pip install -r requirements.txt
-
-# Run the FastAPI server
-uvicorn main:app --reload --port 8000
+source .venv/bin/activate
+PYTHONPATH=. uvicorn main:app --reload --port 8000
 ```
-The FastAPI documentation will be available at [http://localhost:8000/docs](http://localhost:8000/docs).
+Interactive API docs are available at [http://localhost:8000/docs](http://localhost:8000/docs).
 
-### 3. Frontend Setup & Run
-
-Navigate to the frontend directory, install dependencies, and run the Next.js development server:
-
+### 2. Start the Frontend App
+Navigate to `/frontend` directory and run:
 ```bash
-# Navigate to frontend
 cd frontend
-
-# Install packages
 npm install
-
-# Start Next.js development server
 npm run dev
 ```
-The frontend application will be running at [http://localhost:3000](http://localhost:3000).
+The client UI will run on [http://localhost:3000](http://localhost:3000).
 
----
-
-## 🔗 API Endpoints
-
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| **GET** | `/` | API Root / Welcome check |
-| **POST** | `/predict` | Analyzes a single review text for sentiment, confidence, reliability, aspects, and trust. |
-| **POST** | `/batch` | Uploads a CSV of reviews and returns aggregated metrics, distribution, and top complaints. |
-| **GET** | `/stats` | Retrieves dataset metadata and evaluation metrics for all trained models. |
-
----
-
-## 📁 Directory Structure
-
-```text
-.
-├── backend/
-│   ├── main.py              # Application entrypoint & CORS configuration
-│   ├── requirements.txt     # Python pinned dependencies
-│   ├── routes/              # FastAPI router modules (predict, batch, stats)
-│   ├── ml/                  # ML modules (preprocessing, loader, predictor, aspects, trust)
-│   ├── schemas/             # Pydantic request/response validation schemas
-│   ├── models/              # Serialized model pickle files (*.pkl) (gitignored)
-│   └── data/
-│       └── raw/             # Raw Kaggle review CSV datasets (gitignored)
-├── frontend/
-│   ├── app/                 # Next.js pages, routing, and layout
-│   ├── components/          # Reusable React UI components
-│   ├── lib/                 # Shared API client and TS interface definitions
-│   └── public/              # Static public assets
-├── notebooks/
-│   ├── EDA.ipynb            # Exploratory Data Analysis & cleaning notebook
-│   └── Training.ipynb       # Model training, validation, & metric export notebook
-├── .gitignore               # Root git ignore patterns
-└── README.md                # Project documentation
+### 3. Run Test Suites
+Verify that everything is set up correctly by running tests:
+```bash
+cd backend
+PYTHONPATH=. .venv/bin/pytest
 ```
+
+---
+
+## 🤝 Contributing
+Contributions are welcome! Please follow [PEP 8](https://peps.python.org/pep-0008/) style guidelines for Python code, run tests before submitting PRs, and make edits inside the appropriate directories (`backend` / `frontend`).
+
+---
+
+## 📄 License
+This project is licensed under the MIT License.
