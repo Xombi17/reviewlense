@@ -18,7 +18,8 @@ from sklearn.metrics import (
 
 # Paths
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATA_PATH = os.path.join(BASE_DIR, "data", "processed_reviews.csv")
+TRAIN_DATA_PATH = os.path.join(BASE_DIR, "data", "processed_train_reviews.csv")
+TEST_DATA_PATH = os.path.join(BASE_DIR, "data", "processed_test_reviews.csv")
 MODELS_DIR = os.path.join(BASE_DIR, "models")
 PLOTS_DIR = os.path.join(os.path.dirname(BASE_DIR), "notebooks", "plots")
 STATS_PATH = os.path.join(BASE_DIR, "data", "stats.json")
@@ -27,7 +28,7 @@ FAILURE_ANALYSIS_PATH = os.path.join(BASE_DIR, "data", "failure_analysis.json")
 def train_pipeline():
     """
     Executes the full ML training pipeline:
-    1. Load and split data
+    1. Load train and test datasets
     2. Vectorize text (TF-IDF)
     3. Train classifiers (NB, LR, Calibrated SVM)
     4. Evaluate and save metrics/plots
@@ -40,21 +41,23 @@ def train_pipeline():
     os.makedirs(PLOTS_DIR, exist_ok=True)
     
     # 1. Load data
-    if not os.path.exists(DATA_PATH):
-        raise FileNotFoundError(f"Processed data not found at {DATA_PATH}")
+    if not os.path.exists(TRAIN_DATA_PATH) or not os.path.exists(TEST_DATA_PATH):
+        raise FileNotFoundError(
+            f"Processed data not found. Please run ml/build_multidomain_dataset.py first.\n"
+            f"Expected:\n - {TRAIN_DATA_PATH}\n - {TEST_DATA_PATH}"
+        )
     
-    df = pd.read_csv(DATA_PATH)
+    df_train = pd.read_csv(TRAIN_DATA_PATH)
+    df_test = pd.read_csv(TEST_DATA_PATH)
+    
     # Ensure label is int
-    df['label'] = df['label'].astype(int)
+    df_train['label'] = df_train['label'].astype(int)
+    df_test['label'] = df_test['label'].astype(int)
     
-    # R1.3.1: 80/20 stratified split
-    X_train_raw, X_test_raw, y_train, y_test = train_test_split(
-        df['clean_text'], 
-        df['label'], 
-        test_size=0.20, 
-        random_state=42, 
-        stratify=df['label']
-    )
+    X_train_raw = df_train['clean_text']
+    y_train = df_train['label']
+    X_test_raw = df_test['clean_text']
+    y_test = df_test['label']
     
     # 2. Vectorization (R1.2.1)
     vectorizer = TfidfVectorizer(
@@ -65,7 +68,7 @@ def train_pipeline():
         sublinear_tf=True
     )
     
-    # Fit ONLY on training split
+    # Fit ONLY on training data
     X_train = vectorizer.fit_transform(X_train_raw.fillna(''))
     X_test = vectorizer.transform(X_test_raw.fillna(''))
     
@@ -172,15 +175,15 @@ def train_pipeline():
         
     # Stats JSON
     stats = {
-        "total_reviews": len(df),
+        "total_reviews": len(df_train) + len(df_test),
         "avg_confidence": float(np.mean(confidences)),
         "dataset_summary": {
-            "total_reviews": len(df),
-            "positive_count": int(np.sum(df['label'] == 1)),
-            "negative_count": int(np.sum(df['label'] == 0)),
-            "positive_percentage": float(np.sum(df['label'] == 1) / len(df) * 100),
-            "negative_percentage": float(np.sum(df['label'] == 0) / len(df) * 100),
-            "source": "Hugging Face McAuley-Lab/Amazon-Reviews-2023"
+            "total_reviews": len(df_train),
+            "positive_count": int(np.sum(df_train['label'] == 1)),
+            "negative_count": int(np.sum(df_train['label'] == 0)),
+            "positive_percentage": float(np.sum(df_train['label'] == 1) / len(df_train) * 100),
+            "negative_percentage": float(np.sum(df_train['label'] == 0) / len(df_train) * 100),
+            "source": "Amazon Review Polarity Dataset (Local)"
         },
         "models": {
             "lr": {**metrics['lr'], "name": "Logistic Regression", "is_default": True},
