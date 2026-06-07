@@ -27,7 +27,7 @@ class TrustAnalyzer:
             word_counts: Dict[str, int] = {}
             for word in words:
                 word_counts[word] = word_counts.get(word, 0) + 1
-            if any(count > 3 for count in word_counts.values()):
+            if any(count > 3 for word, count in word_counts.items() if word not in {"the", "and", "a", "an", "of", "to", "in", "it", "is", "that", "this", "with", "for", "as", "by", "on", "at"}):
                 score -= 0.15
 
         score = max(0.0, score)

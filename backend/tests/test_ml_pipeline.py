@@ -6,6 +6,10 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from backend.ml.train import train_pipeline
 
+TEST_DIR = os.path.dirname(os.path.abspath(__file__))
+BACKEND_DIR = os.path.dirname(TEST_DIR)
+PROJECT_ROOT = os.path.dirname(BACKEND_DIR)
+
 def test_tfidf_vectorizer():
     """
     R1.2.1: TF-IDF Vectorizer configuration check.
@@ -33,7 +37,7 @@ def test_model_training_and_serialization():
     assert 'sentiment_svm' in results
     
     # Check serialized files exist
-    model_dir = "backend/models/"
+    model_dir = os.path.join(BACKEND_DIR, "models")
     assert os.path.exists(os.path.join(model_dir, "vectorizer.pkl"))
     assert os.path.exists(os.path.join(model_dir, "sentiment_nb.pkl"))
     assert os.path.exists(os.path.join(model_dir, "sentiment_lr.pkl"))
@@ -57,7 +61,7 @@ def test_model_evaluation():
         assert 'auc' in m
 
     # Check plots exist
-    plot_dir = "notebooks/plots/"
+    plot_dir = os.path.join(PROJECT_ROOT, "notebooks", "plots")
     for model_name in ['nb', 'lr', 'svm']:
         assert os.path.exists(os.path.join(plot_dir, f"confusion_matrix_{model_name}.png"))
         assert os.path.exists(os.path.join(plot_dir, f"roc_curve_{model_name}.png"))
@@ -69,15 +73,17 @@ def test_reliability_metrics_and_failure_analysis():
     results = train_pipeline()
     
     # Check stats.json
-    assert os.path.exists("backend/data/stats.json")
-    stats = pd.read_json("backend/data/stats.json", typ='series')
+    stats_json_path = os.path.join(BACKEND_DIR, "data", "stats.json")
+    assert os.path.exists(stats_json_path)
+    stats = pd.read_json(stats_json_path, typ='series')
     assert 'total_reviews' in stats
     assert 'avg_confidence' in stats
     
     # Check failure_analysis.json
-    assert os.path.exists("backend/data/failure_analysis.json")
+    failure_analysis_path = os.path.join(BACKEND_DIR, "data", "failure_analysis.json")
+    assert os.path.exists(failure_analysis_path)
     import json
-    with open("backend/data/failure_analysis.json", 'r') as f:
+    with open(failure_analysis_path, 'r') as f:
         failures = json.load(f)
     assert isinstance(failures, list)
     assert len(failures) >= 10
