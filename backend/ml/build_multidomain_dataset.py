@@ -90,19 +90,19 @@ def build_dataset():
     print(" 🛠️  ReviewLens AI - Train/Test Dataset Builder")
     print("="*60 + "\n")
 
-    # Compile Train dataset (100,000 total)
-    print(f" 📦 Compiling Train Dataset (100K reviews) from: {AMAZON_TRAIN_PATH}")
-    train_count = process_file(AMAZON_TRAIN_PATH, OUTPUT_TRAIN_PATH, 50000, 50000)
-    
-    # Compile Test dataset (20,000 total)
-    print(f"\n 📦 Compiling Test Dataset (20K reviews) from: {AMAZON_TEST_PATH}")
-    test_count = process_file(AMAZON_TEST_PATH, OUTPUT_TEST_PATH, 10000, 10000)
-    
+    # Compile Train dataset (1,000,000 total = 500K pos + 500K neg)
+    print(f" 📦 Compiling Train Dataset (1M reviews) from: {AMAZON_TRAIN_PATH}")
+    train_count = process_file(AMAZON_TRAIN_PATH, OUTPUT_TRAIN_PATH, 500000, 500000)
+
+    # Compile Test dataset (400K total = 200K pos + 200K neg, uses full test set)
+    print(f"\n 📦 Compiling Test Dataset (400K reviews) from: {AMAZON_TEST_PATH}")
+    test_count = process_file(AMAZON_TEST_PATH, OUTPUT_TEST_PATH, 200000, 200000)
+
     print("\n" + "="*60)
     print(" 🎉 Compilation Successful!")
     print("="*60)
-    print(f" 📂 Train Data: {OUTPUT_TRAIN_PATH} ({train_count} reviews)")
-    print(f" 📂 Test Data:  {OUTPUT_TEST_PATH} ({test_count} reviews)")
+    print(f" 📂 Train Data: {OUTPUT_TRAIN_PATH} ({train_count:,} reviews)")
+    print(f" 📂 Test Data:  {OUTPUT_TEST_PATH} ({test_count:,} reviews)")
     print("="*60 + "\n")
 
 if __name__ == "__main__":

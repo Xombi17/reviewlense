@@ -1,53 +1,44 @@
 {
-  "total_reviews": 19418,
-  "avg_confidence": 0.9167175967592068,
+  "total_reviews": 1398553,
+  "avg_confidence": 0.907566249370575,
   "dataset_summary": {
-    "total_reviews": 19418,
-    "positive_count": 17554,
-    "negative_count": 1864,
-    "positive_percentage": 90.40065918220208,
-    "negative_percentage": 9.59934081779792,
-    "source": "Hugging Face McAuley-Lab/Amazon-Reviews-2023"
+    "total_reviews": 1000000,
+    "positive_count": 500000,
+    "negative_count": 500000,
+    "positive_percentage": 50.0,
+    "negative_percentage": 50.0,
+    "source": "Amazon Review Polarity Dataset (Local) - 1M balanced subset"
   },
   "models": {
     "lr": {
-      "accuracy": 0.9307415036045315,
-      "precision": 0.9308878256246678,
-      "recall": 0.9974366277413842,
-      "f1": 0.9630138869792383,
-      "auc": 0.9607255023087149,
+      "accuracy": 0.9208712517532173,
+      "precision": 0.9202304487131274,
+      "recall": 0.9215288517544036,
+      "f1": 0.9208791925598292,
+      "auc": 0.9751527201320513,
       "name": "Logistic Regression",
       "is_default": true
     },
     "nb": {
-      "accuracy": 0.9070545829042225,
-      "precision": 0.9067665289256198,
-      "recall": 1.0,
-      "f1": 0.9511038873086821,
-      "auc": 0.9209058012237297,
+      "accuracy": 0.8784352394788146,
+      "precision": 0.8904826556945495,
+      "recall": 0.8628411898210449,
+      "f1": 0.8764440364164945,
+      "auc": 0.9503431478990761,
       "name": "Multinomial Naive Bayes",
-      "is_default": false
-    },
-    "svm": {
-      "accuracy": 0.9495365602471678,
-      "precision": 0.9615705931495405,
-      "recall": 0.9834804898889206,
-      "f1": 0.9724021402421853,
-      "auc": 0.964340338255181,
-      "name": "Linear SVM (Calibrated)",
       "is_default": false
     }
   },
   "reliability_summary": {
-    "high_confidence_percentage": 75.74665293511843,
-    "medium_confidence_percentage": 18.28012358393409,
-    "low_confidence_percentage": 5.9732234809474765
+    "high_confidence_percentage": 70.6189641026413,
+    "medium_confidence_percentage": 18.90263026498358,
+    "low_confidence_percentage": 10.478405632375116
   },
   "failure_modes": {
-    "mixed_sentiment": 2.0,
-    "sarcasm": 1.0,
-    "comparative": 2.0,
-    "short_review": 3.0,
-    "negation_failure": 7.0
+    "mixed_sentiment": 7.0,
+    "sarcasm": 0.0,
+    "comparative": 0.0,
+    "short_review": 0.0,
+    "negation_failure": 8.0
   }
 }

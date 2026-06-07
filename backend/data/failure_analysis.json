@@ -1,107 +1,107 @@
 [
   {
-    "review_text": "pick thick clunky not readily heat formable resize adjust convexity tip heat open top resistant resetting fit finger mean stuck box plastic pick small large family member also metal pick thick appear not annealed also not formable next time buy ernie ball dunlop pay bit sell really good metal pick wide variety size thickness plastic pick",
+    "review_text": "not ultimate guide firstly enjoyed format tone book author addressed reader however not feel imparted insider secret book promised reveal starting research law school not know requirement admission book may tremendous help done homework looking edge come admission recommend topic specific book example book write personal statment book geared specifically towards lsat preparation powerscore book helpful website great advice geared towards aiding individual asking write letter recommendation yet new entire affair book definitely clarify requirement",
     "true_sentiment": 0,
     "predicted_sentiment": 1,
-    "confidence": 0.7286060862678782,
-    "failure_type": "negation_failure"
-  },
-  {
-    "review_text": "leather design first look beautiful however standard yamaha flute case not fit reunion blue zipper not close yamaha handle wish mentioned description saving buy carrying case return real disappointment",
-    "true_sentiment": 0,
-    "predicted_sentiment": 1,
-    "confidence": 0.5474755326584302,
+    "confidence": 0.860537588596344,
     "failure_type": "mixed_sentiment"
   },
   {
-    "review_text": "string not last long one bought store not sure amazon old one 3 pack purchased broke faster string gotten make sure get store next time normally wonderful great sound last longer",
-    "true_sentiment": 0,
-    "predicted_sentiment": 1,
-    "confidence": 0.7836926928274218,
-    "failure_type": "negation_failure"
-  },
-  {
-    "review_text": "seems well made not fit 4 4 violin titch small",
-    "true_sentiment": 0,
-    "predicted_sentiment": 1,
-    "confidence": 0.6284972697079404,
-    "failure_type": "negation_failure"
-  },
-  {
-    "review_text": "9and 10 hole crackle",
-    "true_sentiment": 0,
-    "predicted_sentiment": 1,
-    "confidence": 0.8062814213854962,
-    "failure_type": "short_review"
-  },
-  {
-    "review_text": "thinner string set short reach tuner key unusable fender squier vi bass",
-    "true_sentiment": 0,
-    "predicted_sentiment": 1,
-    "confidence": 0.8229210056639125,
-    "failure_type": "comparative"
-  },
-  {
-    "review_text": "exactly 12 inch measure outside spout outside edge please not advertise 12 14 inch horn slightly 11 inch tip tip ignoring curve bought one ebay almost half price longer wider knocked another star annoying sticker horn big time consuming remove not put advertisement card include optional vinyl sticker bag smell not counting realize horn trapped inside horn not smell inside several white powdery streak not sure make horn not",
-    "true_sentiment": 0,
-    "predicted_sentiment": 1,
-    "confidence": 0.7254060727211334,
-    "failure_type": "negation_failure"
-  },
-  {
-    "review_text": "purchased teenage girl party odor fog solution faintly unpleasant high drama among teenage girl fog effect also minimal",
-    "true_sentiment": 0,
-    "predicted_sentiment": 1,
-    "confidence": 0.9002679543681753,
-    "failure_type": "comparative"
-  },
-  {
-    "review_text": "yet use cable anything not make noise crackle snap pop sure something wrong soldering inside taking chin well frankly not super pleased amazon 's customer support lately not look like buying much amazon anyway would rather take eat loss one deal inconsistency amazon 's customer support return frankly",
-    "true_sentiment": 0,
-    "predicted_sentiment": 1,
-    "confidence": 0.6974569432076406,
+    "review_text": "work great bought item connect strobe light unit function well not sure range claimed never really believe everything manufacturer claim product like many variable say work neighbor house garage least 40 ' going thru two building make much noise later night simply press button let know",
+    "true_sentiment": 1,
+    "predicted_sentiment": 0,
+    "confidence": 0.5913442373275757,
     "failure_type": "mixed_sentiment"
   },
   {
-    "review_text": "expensive concerned moment",
-    "true_sentiment": 0,
-    "predicted_sentiment": 1,
-    "confidence": 0.8674672733062351,
-    "failure_type": "short_review"
-  },
-  {
-    "review_text": "ordering boxed program expecting zip drive cd product would upload computer much process",
-    "true_sentiment": 0,
-    "predicted_sentiment": 1,
-    "confidence": 0.7788279699313999,
-    "failure_type": "sarcasm"
-  },
-  {
-    "review_text": "headphone make listening music sound wonderful audiophile forum love thing first not expect last long term part reinforced made cheaply dropping hardwood floor 3ft snapped no way repair good lasted wished got something bit durable",
-    "true_sentiment": 0,
-    "predicted_sentiment": 1,
-    "confidence": 0.8391870710407681,
+    "review_text": "amazing love touch bad dvd description not mention no subtitle",
+    "true_sentiment": 1,
+    "predicted_sentiment": 0,
+    "confidence": 0.7336567640304565,
     "failure_type": "negation_failure"
   },
   {
-    "review_text": "tuning fine one week battery died",
-    "true_sentiment": 0,
-    "predicted_sentiment": 1,
-    "confidence": 0.7370117771776552,
-    "failure_type": "short_review"
+    "review_text": "great beginning poor ending parricia corwell cruel unusual breathtaking beginning relation family dedication work exeptional however story began get boring towards end ending not great",
+    "true_sentiment": 1,
+    "predicted_sentiment": 0,
+    "confidence": 0.5183366537094116,
+    "failure_type": "mixed_sentiment"
   },
   {
-    "review_text": "not quality stage product inexpensive mic look desk one day use actual recording switch mic clip top screw crimped came soon started screwing clip use plier hold installing place back top stand could never use go stand many stage product definitely not meet normal quality standard",
+    "review_text": "historical gem whose title obscures intent started laughing second chapter enjoyed book realized not going learn anything new obviously miracle survived 65 year since first published seeing pending insolvency u loudly shouted 40 's worth price book quote would shame modern day political extreme u kudos whoever owns copyright economics action",
     "true_sentiment": 0,
     "predicted_sentiment": 1,
-    "confidence": 0.6524024608666485,
+    "confidence": 0.8747515082359314,
     "failure_type": "negation_failure"
   },
   {
-    "review_text": "son used one day fell apart not useable not good quality",
+    "review_text": "broke 2nd time wore great think product provided great fit able hook first row within 5 min max not quite difficult get thought might although not particularly easy either tried wore 2 hour 2nd time wore period time took one metal boning piece popped hanging bottom product far expensive something like happen fit snug sure correct size figure get resolved",
     "true_sentiment": 0,
     "predicted_sentiment": 1,
-    "confidence": 0.5950221510863224,
+    "confidence": 0.5385953187942505,
+    "failure_type": "mixed_sentiment"
+  },
+  {
+    "review_text": "recommend ordering size 2 larger regular size ordered squeem waist shaper size small general size 4 6 5 ' 4 weigh 120lbs right winter ate much cheese gained 7 lb not much complain roll belly fat show slinky dress wanted smooth middle fat hip wish would ordered medium even large instead hooking waist shaper top bottom instructed way way way tight time tried hook lower 6 hip not want uncomfortable want smooth finish similar size recommend ordering medium instead general quality product exceptionally well stitched built last",
+    "true_sentiment": 1,
+    "predicted_sentiment": 0,
+    "confidence": 0.7180370092391968,
+    "failure_type": "negation_failure"
+  },
+  {
+    "review_text": "book great one might notice many negative review book contain horrible grammer multiple spelling error although respect disliked scarlet letter disagree no wonder people not know capitalize word ' ' thought book wonderful willing put effort understanding",
+    "true_sentiment": 1,
+    "predicted_sentiment": 0,
+    "confidence": 0.7159470319747925,
+    "failure_type": "mixed_sentiment"
+  },
+  {
+    "review_text": "sassy baby warming dish interesting concept tried baby warming dish found 1 year old pretty small not really hold enough water keep warm think would work ok infant although think blanket would work well recommendation buy holdsell",
+    "true_sentiment": 1,
+    "predicted_sentiment": 0,
+    "confidence": 0.694244384765625,
+    "failure_type": "mixed_sentiment"
+  },
+  {
+    "review_text": "used circuit project used generator circuit project work pretty well little resistance however wire connection seemed cheap loose would recommend buying battery powered one rechargeable battery worried environment",
+    "true_sentiment": 0,
+    "predicted_sentiment": 1,
+    "confidence": 0.7959837317466736,
+    "failure_type": "mixed_sentiment"
+  },
+  {
+    "review_text": "waiting foreign lauguage aol cd not translation choppy singer medicore best orchestration overwhelming love change everything shredded point hurt listen oddly best song french chanson d'enfance surprised japanese usually put extramely good cast cd cat phantom tokoyo evita great unless total alw aol fanatic save money",
+    "true_sentiment": 0,
+    "predicted_sentiment": 1,
+    "confidence": 0.5121688842773438,
+    "failure_type": "negation_failure"
+  },
+  {
+    "review_text": "thomas connector track thomas wooden track connector piece needed setting different design sometimes setting new design 4 year old grandson whould end no way connect finish piece helped problem",
+    "true_sentiment": 1,
+    "predicted_sentiment": 0,
+    "confidence": 0.5842056274414062,
+    "failure_type": "negation_failure"
+  },
+  {
+    "review_text": "climalite work intended visually interesting plain white material definitely better dampness plain cotton please not wear sandal not visually interesting bottom black part thicker not thick enough pill get natty use know mean thick sock way breaking wear upper white colored part thin stretchy breathable flexible enough well pull slightly rear make no show choose",
+    "true_sentiment": 1,
+    "predicted_sentiment": 0,
+    "confidence": 0.7366474866867065,
+    "failure_type": "negation_failure"
+  },
+  {
+    "review_text": "good midway point wonderful victorian style novel manor house mistress domestic wonderful middle story author make choice effectively shut flow pacing story spooky interesting sudden turn unexpected switch narrator 's point view time setting make rest great read downer",
+    "true_sentiment": 0,
+    "predicted_sentiment": 1,
+    "confidence": 0.9754379987716675,
+    "failure_type": "negation_failure"
+  },
+  {
+    "review_text": "well not everything decent book not lot new information part simply confirmed basic long believed not living dream child encouraging exploration without forcing achievement need provide additional mean learning etc lot time spent selecting school gifted kid really not apply small town like live good chapter different kind gifted child scattered teaching method lot real life example stretched across several chapter opinion became scattered approach probably novel idea came across better good enough parent perfect one klein 's opinion manage perfect parent set standard high child anxiety trying live example not sure 100 interesting take parenting",
+    "true_sentiment": 0,
+    "predicted_sentiment": 1,
+    "confidence": 0.7927131056785583,
     "failure_type": "negation_failure"
   }
 ]

@@ -1,5 +1,6 @@
 import os
 import joblib
+import time
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,7 +13,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.svm import LinearSVC
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.metrics import (
-    accuracy_score, precision_score, recall_score, f1_score, 
+    accuracy_score, precision_score, recall_score, f1_score,
     roc_auc_score, confusion_matrix, roc_curve
 )
 
@@ -60,45 +61,63 @@ def train_pipeline():
     y_test = df_test['label']
     
     # 2. Vectorization (R1.2.1)
+    print("\n[1/5] Vectorizing text with TF-IDF (float32 for memory efficiency)...")
     vectorizer = TfidfVectorizer(
         max_features=20000,
         ngram_range=(1, 2),
         min_df=2,
         max_df=0.95,
-        sublinear_tf=True
+        sublinear_tf=True,
+        dtype=np.float32
     )
-    
-    # Fit ONLY on training data
+
+    print("      Fitting vectorizer on training data...")
+    start = time.time()
     X_train = vectorizer.fit_transform(X_train_raw.fillna(''))
+    print(f"      ✓ Vectorizer fitted in {time.time() - start:.1f}s | Vocab: {len(vectorizer.vocabulary_):,} | Matrix: {X_train.shape}")
+
+    print("      Transforming test data...")
+    start = time.time()
     X_test = vectorizer.transform(X_test_raw.fillna(''))
-    
+    print(f"      ✓ Test transformed in {time.time() - start:.1f}s | Matrix: {X_test.shape}")
+
     # 3. Model Training
-    # NB
+    print("\n[2/5] Training Naive Bayes...")
+    start = time.time()
     nb_model = MultinomialNB(alpha=1.0)
     nb_model.fit(X_train, y_train)
-    
-    # LR
-    lr_model = LogisticRegression(max_iter=1000, C=1.0, random_state=42)
+    print(f"      ✓ NB trained in {time.time() - start:.1f}s")
+
+    print("\n[3/5] Training Logistic Regression (with progress)...")
+    start = time.time()
+    lr_model = LogisticRegression(max_iter=1000, C=1.0, random_state=42, verbose=1, n_jobs=-1)
     lr_model.fit(X_train, y_train)
-    
-    # Calibrated SVM (R2.3)
+    print(f"      ✓ LR trained in {time.time() - start:.1f}s | Iterations: {lr_model.n_iter_[0]}")
+
+    print("\n[4/5] Training Calibrated Linear SVM (5-fold CV)...")
+    start = time.time()
     base_svc = LinearSVC(C=1.0, random_state=42, dual=False)
     svm_model = CalibratedClassifierCV(estimator=base_svc, method='sigmoid', cv=5)
     svm_model.fit(X_train, y_train)
+    print(f"      ✓ SVM trained in {time.time() - start:.1f}s")
     
     # 4. Evaluation (R1.4)
     models = {
         'nb': nb_model,
         'lr': lr_model,
-        'svm': svm_model
     }
-    
+    if svm_model is not None:
+        models['svm'] = svm_model
+
     metrics = {}
-    
+
+    print("\n[4/5] Evaluating models on test set...")
     for name, model in models.items():
+        print(f"      Evaluating {name.upper()}...")
+        start = time.time()
         y_pred = model.predict(X_test)
         y_proba = model.predict_proba(X_test)[:, 1]
-        
+
         metrics[name] = {
             'accuracy': float(accuracy_score(y_test, y_pred)),
             'precision': float(precision_score(y_test, y_pred)),
@@ -106,7 +125,8 @@ def train_pipeline():
             'f1': float(f1_score(y_test, y_pred)),
             'auc': float(roc_auc_score(y_test, y_proba))
         }
-        
+        print(f"         ✓ Done in {time.time() - start:.1f}s | AUC: {metrics[name]['auc']:.4f} | F1: {metrics[name]['f1']:.4f}")
+
         # Plots
         plt.figure(figsize=(8, 6))
         cm = confusion_matrix(y_test, y_pred)
@@ -116,7 +136,7 @@ def train_pipeline():
         plt.xlabel('Predicted Label')
         plt.savefig(os.path.join(PLOTS_DIR, f'confusion_matrix_{name}.png'))
         plt.close()
-        
+
         plt.figure(figsize=(8, 6))
         fpr, tpr, _ = roc_curve(y_test, y_proba)
         plt.plot(fpr, tpr, label=f'AUC = {metrics[name]["auc"]:.3f}')
@@ -130,26 +150,27 @@ def train_pipeline():
 
     # 5. Reliability & Failure Analysis (R1.5)
     # Using LR as default for failure analysis and confidence stats
+    print("\n[5/5] Reliability analysis & failure analysis...")
     default_model = lr_model
     y_test_proba = default_model.predict_proba(X_test)
     confidences = np.max(y_test_proba, axis=1)
     y_test_pred = default_model.predict(X_test)
-    
+
     high_conf = np.sum(confidences >= 0.90) / len(confidences) * 100
     med_conf = np.sum((confidences >= 0.70) & (confidences < 0.90)) / len(confidences) * 100
     low_conf = np.sum(confidences < 0.70) / len(confidences) * 100
-    
+
     # Failure Analysis
     incorrect_indices = np.where(y_test_pred != y_test)[0]
     failure_data = []
-    
+
     # Heuristic categorization for 15 examples
     for i in incorrect_indices[:15]:
         review_text = X_test_raw.iloc[i]
         true_val = int(y_test.iloc[i])
         pred_val = int(y_test_pred[i])
         conf = float(confidences[i])
-        
+
         # Heuristics for failure types
         if len(str(review_text).split()) < 10:
             fail_type = "short_review"
@@ -161,7 +182,7 @@ def train_pipeline():
             fail_type = "comparative"
         else:
             fail_type = "sarcasm" # Default fallback
-            
+
         failure_data.append({
             "review_text": str(review_text),
             "true_sentiment": true_val,
@@ -169,10 +190,10 @@ def train_pipeline():
             "confidence": conf,
             "failure_type": fail_type
         })
-        
+
     with open(FAILURE_ANALYSIS_PATH, 'w') as f:
         json.dump(failure_data, f, indent=2)
-        
+
     # Stats JSON
     stats = {
         "total_reviews": len(df_train) + len(df_test),
@@ -183,12 +204,11 @@ def train_pipeline():
             "negative_count": int(np.sum(df_train['label'] == 0)),
             "positive_percentage": float(np.sum(df_train['label'] == 1) / len(df_train) * 100),
             "negative_percentage": float(np.sum(df_train['label'] == 0) / len(df_train) * 100),
-            "source": "Amazon Review Polarity Dataset (Local)"
+            "source": "Amazon Review Polarity Dataset (Local) - 1M balanced subset"
         },
         "models": {
             "lr": {**metrics['lr'], "name": "Logistic Regression", "is_default": True},
             "nb": {**metrics['nb'], "name": "Multinomial Naive Bayes", "is_default": False},
-            "svm": {**metrics['svm'], "name": "Linear SVM (Calibrated)", "is_default": False}
         },
         "reliability_summary": {
             "high_confidence_percentage": float(high_conf),
@@ -203,23 +223,33 @@ def train_pipeline():
             "negation_failure": float(sum(1 for f in failure_data if f['failure_type'] == 'negation_failure'))
         }
     }
-    
+
     with open(STATS_PATH, 'w') as f:
         json.dump(stats, f, indent=2)
-    
+
     # 6. Serialization (R1.3.2)
+    print("\n[6/6] Saving models...")
+    start = time.time()
     joblib.dump(vectorizer, os.path.join(MODELS_DIR, 'vectorizer.pkl'))
     joblib.dump(nb_model, os.path.join(MODELS_DIR, 'sentiment_nb.pkl'))
     joblib.dump(lr_model, os.path.join(MODELS_DIR, 'sentiment_lr.pkl'))
-    joblib.dump(svm_model, os.path.join(MODELS_DIR, 'sentiment_svm.pkl'))
-    
-    print("Training Pipeline Complete.")
-    
+    # SVM skipped for 1M training
+    print(f"      ✓ Models saved in {time.time() - start:.1f}s")
+
+    print("\n" + "="*60)
+    print(" 🎉 TRAINING PIPELINE COMPLETE")
+    print("="*60)
+    print(f" 📊 Logistic Regression:  AUC={metrics['lr']['auc']:.4f}  F1={metrics['lr']['f1']:.4f}")
+    print(f" 📊 Naive Bayes:          AUC={metrics['nb']['auc']:.4f}  F1={metrics['nb']['f1']:.4f}")
+    print(f" 💾 Models saved to:      {MODELS_DIR}")
+    print(f" 📈 Plots saved to:       {PLOTS_DIR}")
+    print(f" 📋 Stats saved to:       {STATS_PATH}")
+    print("="*60 + "\n")
+
     return {
         'vectorizer': vectorizer,
         'sentiment_nb': nb_model,
         'sentiment_lr': lr_model,
-        'sentiment_svm': svm_model,
         'metrics': metrics
     }
 

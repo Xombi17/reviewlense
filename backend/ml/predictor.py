@@ -53,7 +53,7 @@ _DEFAULT_PREDICTOR = None
 def _get_default_predictor() -> "Predictor":
     global _DEFAULT_LOADER, _DEFAULT_PREDICTOR
     if _DEFAULT_PREDICTOR is None:
-        from backend.ml.loader import ModelLoader
+        from .loader import ModelLoader
 
         _DEFAULT_LOADER = ModelLoader(models_dir=_MODELS_DIR)
         _DEFAULT_LOADER.load_all_models()
