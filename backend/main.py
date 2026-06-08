@@ -21,12 +21,6 @@ from routes import predict, batch, stats
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    import nltk
-    try:
-        nltk.data.find("tokenizers/punkt_tab")
-    except LookupError:
-        nltk.download("punkt_tab", quiet=True)
-
     backend_dir = os.path.dirname(os.path.abspath(__file__))
     models_dir = os.path.join(backend_dir, "models")
     data_dir = os.path.join(backend_dir, "data")
