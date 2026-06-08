@@ -34,7 +34,11 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Download NLTK data at build time
-RUN python -c "import nltk; nltk.download('punkt_tab', quiet=True)"
+RUN python -c "import nltk; nltk.download('punkt_tab', quiet=True); nltk.download('punkt', quiet=True); nltk.download('stopwords', quiet=True); nltk.download('wordnet', quiet=True)"
+
+# Set NLTK_DATA to a globally accessible location
+ENV NLTK_DATA=/usr/local/share/nltk_data
+RUN mkdir -p $NLTK_DATA && cp -r /root/nltk_data/* $NLTK_DATA/ 2>/dev/null || true
 
 # ---- Runtime Stage ----
 FROM python:3.12-slim AS runtime
@@ -62,7 +66,7 @@ WORKDIR /app
 COPY --from=builder /opt/venv /opt/venv
 
 # Copy NLTK data from builder
-COPY --from=builder /root/nltk_data /root/nltk_data
+COPY --from=builder /usr/local/share/nltk_data /usr/local/share/nltk_data
 
 # Copy application code
 COPY --chown=appuser:appuser ./ ./
