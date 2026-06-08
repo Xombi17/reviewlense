@@ -12,8 +12,8 @@ __pycache__/
 *.pyd
 
 # Serialized model pickle files
-backend/models/*.pkl
-backend/models/*.joblib
+# backend/models/*.pkl
+# backend/models/*.joblib
 
 # Large raw datasets (downloaded from Kaggle)
 backend/data/raw/*
