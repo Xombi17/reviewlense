@@ -61,9 +61,10 @@ app.add_exception_handler(RequestValidationError, request_validation_error_handl
 app.add_exception_handler(Exception, unhandled_exception_handler)
 
 # Enable CORS for Next.js frontend
+allow_origins = os.getenv("ALLOW_ORIGINS", "http://localhost:3000").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=allow_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
