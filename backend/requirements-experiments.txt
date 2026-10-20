@@ -1,0 +1,19 @@
+# Dependencies for backend/experiments (model comparison, calibration, fine-tuning).
+# The serving API does not need any of this; see requirements-vercel.txt for that.
+numpy>=1.26
+pandas>=2.2
+scipy>=1.11
+scikit-learn>=1.5
+matplotlib>=3.8
+
+# Transformer fine-tuning
+torch>=2.2
+transformers>=4.40
+tokenizers>=0.19
+
+# Only for --data hf (Amazon polarity from the Hugging Face hub)
+datasets>=2.19
+
+# Only for --preprocess clean (the production NLTK cleaning pipeline)
+nltk>=3.8
+contractions>=0.1.73
