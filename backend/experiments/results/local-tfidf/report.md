@@ -13,6 +13,9 @@ Splits: train 15,993 / val 2,000 / test 2,000 (seed 42, fingerprint `fbed469f9cc
 | tfidf-lr+clean | 0.8730 [0.8585, 0.8880] | 0.8740 | 0.9466 [0.9370, 0.9551] | 0.3241 | 0.0972 | 0.0697 [0.0596, 0.0840] | 0.0154 | 0.55 |
 | tfidf-nb+clean | 0.8640 [0.8480, 0.8785] | 0.8640 | 0.9363 [0.9252, 0.9463] | 0.3506 | 0.1063 | 0.0771 [0.0650, 0.0911] | 0.0204 | 0.54 |
 | transformer-distilroberta-base | 0.9365 [0.9250, 0.9470] | 0.9373 | 0.9816 [0.9762, 0.9869] | 0.1939 | 0.0503 | 0.0372 [0.0289, 0.0486] | 0.0199 | 1.45 |
+| transformer-distilroberta-base+s1 | 0.9355 [0.9245, 0.9460] | 0.9364 | 0.9809 [0.9750, 0.9861] | 0.2049 | 0.0522 | 0.0403 [0.0319, 0.0514] | 0.0187 | 1.51 |
+| transformer-distilroberta-base+s2 | 0.9375 [0.9260, 0.9485] | 0.9380 | 0.9809 [0.9753, 0.9860] | 0.2031 | 0.0516 | 0.0379 [0.0296, 0.0499] | 0.0182 | 1.48 |
+| transformer-distilroberta-base+s3 | 0.9335 [0.9225, 0.9435] | 0.9325 | 0.9809 [0.9754, 0.9857] | 0.1908 | 0.0523 | 0.0290 [0.0223, 0.0406] | 0.0183 | 1.28 |
 
 ECE is the expected calibration error over 10 equal-width confidence bins (lower is better). T is the temperature fitted on validation; T > 1 means the raw model was overconfident.
 
@@ -25,6 +28,9 @@ ECE is the expected calibration error over 10 equal-width confidence bins (lower
 | tfidf-lr+clean | n/a | 15 | 0.1 | 0.07 | x86_64, 4 CPU threads, no GPU |
 | tfidf-nb+clean | n/a | 15 | 0.1 | 0.07 | x86_64, 4 CPU threads, no GPU |
 | transformer-distilroberta-base | 82,119,938 | 195 | 7.2 | 3.58 | x86_64, 2 CPU threads, GPU Tesla T4 |
+| transformer-distilroberta-base+s1 | 82,119,938 | 183 | 6.8 | 3.38 | x86_64, 2 CPU threads, GPU Tesla T4 |
+| transformer-distilroberta-base+s2 | 82,119,938 | 191 | 7.0 | 3.51 | x86_64, 2 CPU threads, GPU Tesla T4 |
+| transformer-distilroberta-base+s3 | 82,119,938 | 192 | 7.1 | 3.53 | x86_64, 2 CPU threads, GPU Tesla T4 |
 
 Timings are wall-clock on the hardware shown, so they are only comparable between rows run on the same machine.
 
@@ -37,6 +43,9 @@ Timings are wall-clock on the hardware shown, so they are only comparable betwee
 | tfidf-lr+clean | 87.30% | 90.67% | 93.12% | 95.64% | 98.20% | 0.0353 |
 | tfidf-nb+clean | 86.40% | 89.56% | 92.19% | 94.00% | 97.30% | 0.0421 |
 | transformer-distilroberta-base | 93.65% | 97.22% | 98.44% | 98.57% | 99.30% | 0.0133 |
+| transformer-distilroberta-base+s1 | 93.55% | 96.89% | 98.12% | 98.71% | 99.20% | 0.0133 |
+| transformer-distilroberta-base+s2 | 93.75% | 96.78% | 98.06% | 98.71% | 99.20% | 0.0119 |
+| transformer-distilroberta-base+s3 | 93.35% | 96.50% | 97.81% | 98.64% | 99.20% | 0.0126 |
 
 Temperature scaling is monotonic, so it cannot change which predictions rank as most confident; this table is identical before and after calibration. AURC is the area under the risk-coverage curve (lower is better).
 
@@ -58,6 +67,12 @@ The API labels predictions HIGH (confidence >= 0.90), MEDIUM (>= 0.70) and LOW. 
 | tfidf-nb+clean | scaled | 58.8% / 96.1% | 26.2% / 78.7% | 14.9% / 61.9% |
 | transformer-distilroberta-base | raw | 92.5% / 96.8% | 4.9% / 57.7% | 2.6% / 50.9% |
 | transformer-distilroberta-base | scaled | 88.4% / 97.4% | 8.0% / 71.2% | 3.5% / 50.7% |
+| transformer-distilroberta-base+s1 | raw | 93.4% / 96.4% | 4.1% / 53.7% | 2.5% / 54.0% |
+| transformer-distilroberta-base+s1 | scaled | 88.1% / 97.3% | 8.2% / 71.3% | 3.7% / 54.1% |
+| transformer-distilroberta-base+s2 | raw | 93.3% / 96.1% | 4.4% / 62.5% | 2.2% / 55.6% |
+| transformer-distilroberta-base+s2 | scaled | 88.6% / 97.0% | 7.7% / 74.7% | 3.6% / 54.8% |
+| transformer-distilroberta-base+s3 | raw | 89.5% / 96.5% | 7.5% / 71.5% | 3.0% / 53.3% |
+| transformer-distilroberta-base+s3 | scaled | 86.1% / 97.3% | 10.0% / 75.0% | 4.0% / 53.2% |
 
 ![Reliability diagrams](reliability.png)
 
@@ -71,12 +86,43 @@ Accuracy(A) - Accuracy(B) with a paired bootstrap interval, and an exact McNemar
 | tfidf-lr | tfidf-lr+clean | 0.0125 [0.0000, 0.0250] | 87 | 62 | 0.04892 |
 | tfidf-lr | tfidf-nb+clean | 0.0215 [0.0060, 0.0365] | 137 | 94 | 0.005604 |
 | tfidf-lr | transformer-distilroberta-base | -0.0510 [-0.0655, -0.0385] | 43 | 145 | 3.986e-14 |
+| tfidf-lr | transformer-distilroberta-base+s1 | -0.0500 [-0.0640, -0.0370] | 48 | 148 | 4.675e-13 |
+| tfidf-lr | transformer-distilroberta-base+s2 | -0.0520 [-0.0665, -0.0390] | 42 | 146 | 1.16e-14 |
+| tfidf-lr | transformer-distilroberta-base+s3 | -0.0480 [-0.0620, -0.0335] | 59 | 155 | 3.937e-11 |
 | tfidf-nb | tfidf-lr+clean | 0.0105 [-0.0025, 0.0230] | 93 | 72 | 0.1192 |
 | tfidf-nb | tfidf-nb+clean | 0.0195 [0.0075, 0.0310] | 96 | 57 | 0.002025 |
 | tfidf-nb | transformer-distilroberta-base | -0.0530 [-0.0665, -0.0395] | 50 | 156 | 6.994e-14 |
+| tfidf-nb | transformer-distilroberta-base+s1 | -0.0520 [-0.0665, -0.0375] | 55 | 159 | 6.634e-13 |
+| tfidf-nb | transformer-distilroberta-base+s2 | -0.0540 [-0.0680, -0.0400] | 48 | 156 | 1.594e-14 |
+| tfidf-nb | transformer-distilroberta-base+s3 | -0.0500 [-0.0645, -0.0350] | 66 | 166 | 4.031e-11 |
 | tfidf-lr+clean | tfidf-nb+clean | 0.0090 [-0.0045, 0.0220] | 104 | 86 | 0.2174 |
 | tfidf-lr+clean | transformer-distilroberta-base | -0.0635 [-0.0775, -0.0490] | 46 | 173 | 1.643e-18 |
+| tfidf-lr+clean | transformer-distilroberta-base+s1 | -0.0625 [-0.0770, -0.0465] | 53 | 178 | 5.513e-17 |
+| tfidf-lr+clean | transformer-distilroberta-base+s2 | -0.0645 [-0.0785, -0.0500] | 46 | 175 | 6.533e-19 |
+| tfidf-lr+clean | transformer-distilroberta-base+s3 | -0.0605 [-0.0745, -0.0455] | 58 | 179 | 1.51e-15 |
 | tfidf-nb+clean | transformer-distilroberta-base | -0.0725 [-0.0885, -0.0570] | 56 | 201 | 2.33e-20 |
+| tfidf-nb+clean | transformer-distilroberta-base+s1 | -0.0715 [-0.0875, -0.0550] | 62 | 205 | 4.809e-19 |
+| tfidf-nb+clean | transformer-distilroberta-base+s2 | -0.0735 [-0.0895, -0.0575] | 56 | 203 | 9.456e-21 |
+| tfidf-nb+clean | transformer-distilroberta-base+s3 | -0.0695 [-0.0845, -0.0530] | 68 | 207 | 1.712e-17 |
+| transformer-distilroberta-base | transformer-distilroberta-base+s1 | 0.0010 [-0.0055, 0.0080] | 25 | 23 | 0.8854 |
+| transformer-distilroberta-base | transformer-distilroberta-base+s2 | -0.0010 [-0.0075, 0.0050] | 18 | 20 | 0.8714 |
+| transformer-distilroberta-base | transformer-distilroberta-base+s3 | 0.0030 [-0.0055, 0.0115] | 35 | 29 | 0.5323 |
+| transformer-distilroberta-base+s1 | transformer-distilroberta-base+s2 | -0.0020 [-0.0080, 0.0045] | 20 | 24 | 0.6516 |
+| transformer-distilroberta-base+s1 | transformer-distilroberta-base+s3 | 0.0020 [-0.0060, 0.0110] | 36 | 32 | 0.7163 |
+| transformer-distilroberta-base+s2 | transformer-distilroberta-base+s3 | 0.0040 [-0.0035, 0.0115] | 33 | 25 | 0.3581 |
+
+## Seed variance
+
+Same splits and hyperparameters, different training seed (classifier-head initialisation, batch order, dropout). Mean ± sample standard deviation across seeds.
+
+**distilroberta-base (2 epochs, lr 2e-05)**, 4 seeds (42, 1, 2, 3):
+
+| Metric | Across seeds |
+| :-- | :-- |
+| Accuracy | 0.9357 ± 0.0017 (min 0.9335, max 0.9375) |
+| AUC | 0.9811 ± 0.0004 (min 0.9809, max 0.9816) |
+| ECE (raw) | 0.0361 ± 0.0049 (min 0.0290, max 0.0403) |
+| Fitted temperature T | 1.4284 ± 0.1022 (min 1.2798, max 1.5067) |
 
 ## Setup
 
@@ -123,6 +169,66 @@ Accuracy(A) - Accuracy(B) with a paired bootstrap interval, and an exact McNemar
     "best_epoch": 2,
     "n_parameters": 82119938,
     "n_train_used": 15993
+  },
+  "transformer-distilroberta-base+s1": {
+    "model_name": "distilroberta-base",
+    "max_length": 256,
+    "batch_size": 32,
+    "eval_batch_size": 128,
+    "learning_rate": 2e-05,
+    "epochs": 2,
+    "warmup_ratio": 0.06,
+    "weight_decay": 0.01,
+    "max_grad_norm": 1.0,
+    "seed": 1,
+    "max_train_samples": null,
+    "device": "cuda",
+    "log_every": 100,
+    "train_seed": 1,
+    "best_epoch": 2,
+    "n_parameters": 82119938,
+    "n_train_used": 15993,
+    "data_seed": 42
+  },
+  "transformer-distilroberta-base+s2": {
+    "model_name": "distilroberta-base",
+    "max_length": 256,
+    "batch_size": 32,
+    "eval_batch_size": 128,
+    "learning_rate": 2e-05,
+    "epochs": 2,
+    "warmup_ratio": 0.06,
+    "weight_decay": 0.01,
+    "max_grad_norm": 1.0,
+    "seed": 2,
+    "max_train_samples": null,
+    "device": "cuda",
+    "log_every": 100,
+    "train_seed": 2,
+    "best_epoch": 2,
+    "n_parameters": 82119938,
+    "n_train_used": 15993,
+    "data_seed": 42
+  },
+  "transformer-distilroberta-base+s3": {
+    "model_name": "distilroberta-base",
+    "max_length": 256,
+    "batch_size": 32,
+    "eval_batch_size": 128,
+    "learning_rate": 2e-05,
+    "epochs": 2,
+    "warmup_ratio": 0.06,
+    "weight_decay": 0.01,
+    "max_grad_norm": 1.0,
+    "seed": 3,
+    "max_train_samples": null,
+    "device": "cuda",
+    "log_every": 100,
+    "train_seed": 3,
+    "best_epoch": 1,
+    "n_parameters": 82119938,
+    "n_train_used": 15993,
+    "data_seed": 42
   }
 }
 ```
@@ -160,6 +266,27 @@ Versions per model:
     "transformers": "5.20.2"
   },
   "transformer-distilroberta-base": {
+    "python": "3.13.15",
+    "scikit-learn": "1.6.1",
+    "numpy": "2.1.3",
+    "torch": "2.11.0+cu130",
+    "transformers": "5.20.1"
+  },
+  "transformer-distilroberta-base+s1": {
+    "python": "3.13.15",
+    "scikit-learn": "1.6.1",
+    "numpy": "2.1.3",
+    "torch": "2.11.0+cu130",
+    "transformers": "5.20.1"
+  },
+  "transformer-distilroberta-base+s2": {
+    "python": "3.13.15",
+    "scikit-learn": "1.6.1",
+    "numpy": "2.1.3",
+    "torch": "2.11.0+cu130",
+    "transformers": "5.20.1"
+  },
+  "transformer-distilroberta-base+s3": {
     "python": "3.13.15",
     "scikit-learn": "1.6.1",
     "numpy": "2.1.3",

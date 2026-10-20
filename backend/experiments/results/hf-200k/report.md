@@ -11,6 +11,7 @@ Splits: train 159,980 / val 19,998 / test 19,998 (seed 42, fingerprint `5e9d4ef3
 | tfidf-lr | 0.9253 [0.9217, 0.9289] | 0.9251 | 0.9769 [0.9752, 0.9787] | 0.1976 | 0.0570 | 0.0217 [0.0189, 0.0249] | 0.0057 | 0.83 |
 | tfidf-nb | 0.8921 [0.8881, 0.8962] | 0.8912 | 0.9585 [0.9562, 0.9610] | 0.2726 | 0.0805 | 0.0405 [0.0375, 0.0446] | 0.0100 | 0.75 |
 | transformer-distilroberta-base | 0.9611 [0.9584, 0.9637] | 0.9610 | 0.9915 [0.9905, 0.9925] | 0.1374 | 0.0327 | 0.0252 [0.0231, 0.0278] | 0.0119 | 1.48 |
+| transformer-distilroberta-base+saved | 0.9619 [0.9593, 0.9643] | 0.9617 | 0.9915 [0.9905, 0.9925] | 0.1387 | 0.0330 | 0.0249 [0.0229, 0.0278] | 0.0117 | 1.48 |
 
 ECE is the expected calibration error over 10 equal-width confidence bins (lower is better). T is the temperature fitted on validation; T > 1 means the raw model was overconfident.
 
@@ -23,6 +24,7 @@ ECE is the expected calibration error over 10 equal-width confidence bins (lower
 | tfidf-lr | n/a | 42 | 2.4 | 0.12 | x86_64, 2 CPU threads, CPU only |
 | tfidf-nb | n/a | 36 | 2.4 | 0.12 | x86_64, 2 CPU threads, CPU only |
 | transformer-distilroberta-base | 82,119,938 | 1936 | 66.0 | 3.30 | x86_64, 2 CPU threads, GPU Tesla T4 |
+| transformer-distilroberta-base+saved | 82,119,938 | 1932 | 65.8 | 3.29 | x86_64, 2 CPU threads, GPU Tesla T4 |
 
 Timings are wall-clock on the hardware shown, so they are only comparable between rows run on the same machine.
 
@@ -33,6 +35,7 @@ Timings are wall-clock on the hardware shown, so they are only comparable betwee
 | tfidf-lr | 92.53% | 95.79% | 97.56% | 98.52% | 99.25% | 0.0149 |
 | tfidf-nb | 89.21% | 92.88% | 95.17% | 96.69% | 98.31% | 0.0284 |
 | transformer-distilroberta-base | 96.11% | 98.56% | 99.19% | 99.46% | 99.52% | 0.0062 |
+| transformer-distilroberta-base+saved | 96.19% | 98.59% | 99.23% | 99.46% | 99.49% | 0.0062 |
 
 Temperature scaling is monotonic, so it cannot change which predictions rank as most confident; this table is identical before and after calibration. AURC is the area under the risk-coverage curve (lower is better).
 
@@ -50,6 +53,8 @@ The API labels predictions HIGH (confidence >= 0.90), MEDIUM (>= 0.70) and LOW. 
 | tfidf-nb | scaled | 64.1% / 97.3% | 22.7% / 83.3% | 13.1% / 59.8% |
 | transformer-distilroberta-base | raw | 96.5% / 97.4% | 2.3% / 65.4% | 1.2% / 50.6% |
 | transformer-distilroberta-base | scaled | 94.1% / 98.0% | 4.1% / 71.4% | 1.8% / 53.1% |
+| transformer-distilroberta-base+saved | raw | 96.5% / 97.4% | 2.4% / 65.3% | 1.1% / 60.6% |
+| transformer-distilroberta-base+saved | scaled | 94.1% / 98.0% | 4.1% / 70.1% | 1.8% / 61.5% |
 
 ![Reliability diagrams](reliability.png)
 
@@ -61,7 +66,10 @@ Accuracy(A) - Accuracy(B) with a paired bootstrap interval, and an exact McNemar
 | :-- | :-- | :-- | :-- | :-- | :-- |
 | tfidf-lr | tfidf-nb | 0.0332 [0.0294, 0.0369] | 1157 | 493 | 1.484e-61 |
 | tfidf-lr | transformer-distilroberta-base | -0.0358 [-0.0393, -0.0324] | 296 | 1012 | 7.986e-92 |
+| tfidf-lr | transformer-distilroberta-base+saved | -0.0366 [-0.0400, -0.0330] | 286 | 1017 | 2.721e-96 |
 | tfidf-nb | transformer-distilroberta-base | -0.0690 [-0.0731, -0.0646] | 313 | 1693 | 1.471e-228 |
+| tfidf-nb | transformer-distilroberta-base+saved | -0.0698 [-0.0737, -0.0655] | 301 | 1696 | 2.119e-235 |
+| transformer-distilroberta-base | transformer-distilroberta-base+saved | -0.0008 [-0.0017, 0.0002] | 43 | 58 | 0.1633 |
 
 ## Setup
 
@@ -114,6 +122,26 @@ Accuracy(A) - Accuracy(B) with a paired bootstrap interval, and an exact McNemar
     "best_epoch": 2,
     "n_parameters": 82119938,
     "n_train_used": 159980
+  },
+  "transformer-distilroberta-base+saved": {
+    "model_name": "distilroberta-base",
+    "max_length": 256,
+    "batch_size": 32,
+    "eval_batch_size": 128,
+    "learning_rate": 2e-05,
+    "epochs": 2,
+    "warmup_ratio": 0.06,
+    "weight_decay": 0.01,
+    "max_grad_norm": 1.0,
+    "seed": 42,
+    "max_train_samples": null,
+    "device": "cuda",
+    "log_every": 100,
+    "train_seed": 42,
+    "best_epoch": 2,
+    "n_parameters": 82119938,
+    "n_train_used": 159980,
+    "data_seed": 42
   }
 }
 ```
@@ -137,6 +165,13 @@ Versions per model:
     "transformers": "5.20.1"
   },
   "transformer-distilroberta-base": {
+    "python": "3.13.15",
+    "scikit-learn": "1.6.1",
+    "numpy": "2.1.3",
+    "torch": "2.11.0+cu130",
+    "transformers": "5.20.1"
+  },
+  "transformer-distilroberta-base+saved": {
     "python": "3.13.15",
     "scikit-learn": "1.6.1",
     "numpy": "2.1.3",
