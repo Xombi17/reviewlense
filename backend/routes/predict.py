@@ -1,9 +1,9 @@
 """POST /predict with sentiment, aspect, and trust analysis."""
 
 from fastapi import APIRouter, Request
+from fastapi.concurrency import run_in_threadpool
 
 from exceptions import EmptyReviewError, ModelNotFoundError
-from ml.preprocessing import clean_review_text
 from schemas.predict import AspectSentiment, PredictRequest, PredictResponse
 
 router = APIRouter()
@@ -46,30 +46,18 @@ async def predict(request: Request, body: PredictRequest) -> PredictResponse:
         raise EmptyReviewError("Review text is empty or whitespace-only.")
 
     loader = _get_loader(request)
-    available_models = list(loader.models.keys())
+    available_models = loader.available_models()
     if body.model not in available_models:
         raise ModelNotFoundError(
             f"Model '{body.model}' is not loaded. Available: {available_models}"
         )
 
-    cleaned_review = clean_review_text(body.review)
     predictor = _get_predictor(request)
-    if cleaned_review:
-        sentiment_result = predictor.predict_sentiment(
-            cleaned_review, model_name=body.model
-        )
-    else:
-        sentiment_result = {
-            "sentiment": 0,
-            "confidence": 0.5,
-            "reliability": "LOW",
-            "flags": ["uncertain_prediction", "empty_text"],
-        }
+    # Model inference is CPU-bound (slow for the transformer); keep it off the event loop.
+    sentiment_result = await run_in_threadpool(predictor.predict_review, body.review, body.model)
 
     extractor = _get_extractor(request)
-    aspects_raw = extractor.extract_aspects(
-        body.review, model_name=body.model
-    )
+    aspects_raw = await run_in_threadpool(extractor.extract_aspects, body.review, body.model)
     aspects = [
         AspectSentiment(
             aspect=aspect["aspect"],

@@ -16,7 +16,7 @@ from ml.aspects import AspectExtractor
 from ml.loader import ModelLoader
 from ml.predictor import Predictor
 from ml.trust import TrustAnalyzer
-from routes import predict, batch, stats
+from routes import predict, batch, stats, models
 
 
 @asynccontextmanager
@@ -74,6 +74,7 @@ app.add_middleware(
 app.include_router(predict.router, tags=["sentiment"])
 app.include_router(batch.router, tags=["batch"])
 app.include_router(stats.router, tags=["stats"])
+app.include_router(models.router, tags=["models"])
 
 @app.get("/")
 async def root():

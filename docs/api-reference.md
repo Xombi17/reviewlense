@@ -1,6 +1,6 @@
 # ReviewLens AI - API Reference
 
-The ReviewLens AI backend is powered by FastAPI and exposes three core endpoints for single predictions, bulk batch uploads, and dataset statistics.
+The ReviewLens AI backend is powered by FastAPI and exposes endpoints for single predictions, bulk batch uploads, the available models, and dataset statistics.
 
 ---
 
@@ -11,7 +11,9 @@ Analyze a single string of text for overall sentiment, specific aspects, and rev
 * **Content-Type**: `application/json`
 * **Request Schema**:
   - `review` (string, required, max length: 5000): The review text to analyze.
-  - `model` (string, optional, default: `"lr"`): The classifier to use (`"lr"` or `"nb"`).
+  - `model` (string, optional, default: `"lr"`): The classifier to use: `"lr"`, `"nb"`, or `"transformer"` when the fine-tuned model is configured (see [Serving the transformer](#serving-the-transformer)). Call `GET /models` to see what a deployment offers.
+
+The TF-IDF models (`lr`, `nb`) clean the text before classifying it. The transformer reads the review exactly as written, and its `confidence` is calibrated: it is the probability after a temperature fitted on validation data, so `reliability` tiers (HIGH >= 0.90, MEDIUM >= 0.70, LOW) correspond to the accuracy they claim far more closely than the raw TF-IDF confidences do.
 
 ### Example Request
 ```json
@@ -54,6 +56,7 @@ Process a CSV file containing reviews and return aggregated metrics, distributio
 * **Content-Type**: `multipart/form-data`
 * **Request Body**:
   - `file`: A CSV file containing a column named exactly `reviewText`.
+  - `model` (query parameter, optional, default: `"lr"`): `"lr"`, `"nb"` or `"transformer"`. The transformer is much slower per review, so uploads are capped at `TRANSFORMER_MAX_BATCH_ROWS` rows (default 500); larger files get a `422`. The response includes `model_used`.
 * **Constraints**:
   - Max file size: `5 MB`.
   - Max row limit: `2000` rows.
@@ -87,13 +90,31 @@ Process a CSV file containing reviews and return aggregated metrics, distributio
     "HIGH": 110,
     "MEDIUM": 25,
     "LOW": 13
-  }
+  },
+  "model_used": "lr"
 }
 ```
 
 ---
 
-## 3. Dataset & Model Statistics
+## 3. Available Models
+List the models this deployment can serve.
+
+* **Endpoint**: `GET /models`
+
+### Example Response (`200 OK`)
+```json
+{
+  "models": [
+    {"id": "lr", "name": "Logistic Regression (TF-IDF)", "is_default": true, "calibrated": false, "temperature": null, "base_model": null},
+    {"id": "nb", "name": "Multinomial Naive Bayes (TF-IDF)", "is_default": false, "calibrated": false, "temperature": null, "base_model": null},
+    {"id": "transformer", "name": "DistilRoBERTa (fine-tuned)", "is_default": false, "calibrated": true, "temperature": 1.481, "base_model": "distilroberta-base"}
+  ]
+}
+```
+`transformer` appears only when `TRANSFORMER_MODEL` is set.
+
+## 4. Dataset & Model Statistics
 Retrieve cached dataset metadata and evaluation metrics for all trained models.
 
 * **Endpoint**: `GET /stats`
@@ -145,6 +166,21 @@ Retrieve cached dataset metadata and evaluation metrics for all trained models.
   }
 }
 ```
+
+---
+
+## Serving the transformer
+
+The transformer is optional and off by default. To enable it, install `requirements-transformer.txt` and point the API at the folder written by `python -m experiments.run_experiment --save-model DIR` (or at a Hugging Face hub id that contains the same files):
+
+| Environment variable | Meaning |
+| :-- | :-- |
+| `TRANSFORMER_MODEL` | Local directory or hub id. Unset means TF-IDF only. A value that cannot be loaded stops startup with an error instead of silently serving TF-IDF only. |
+| `TRANSFORMER_DEVICE` | `cpu` or `cuda`. Defaults to `cuda` when available, else `cpu`. |
+| `TRANSFORMER_BATCH_SIZE` | Reviews scored per forward pass (default 32). |
+| `TRANSFORMER_MAX_BATCH_ROWS` | Row cap for `/batch` with the transformer (default 500). |
+
+The model folder must contain `calibration.json` next to the weights. It holds the temperature fitted on validation data; loading refuses a folder without it, because an uncalibrated confidence would make the reliability tiers meaningless.
 
 ---
 
