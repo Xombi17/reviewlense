@@ -879,6 +879,226 @@
           "confidence": 0.9835682519071125
         }
       ]
+    },
+    "transformer-distilroberta-base": {
+      "uncalibrated": {
+        "temperature": 1.0,
+        "accuracy": 0.9365,
+        "f1": 0.9373458312777504,
+        "auc": 0.98160283442551,
+        "nll": 0.1938822180157469,
+        "brier": 0.0502730493880766,
+        "ece": 0.037168566289678066,
+        "accuracy_ci": [
+          0.925,
+          0.947
+        ],
+        "auc_ci": [
+          0.9762015480840718,
+          0.9868924012764444
+        ],
+        "ece_ci": [
+          0.02888142815061846,
+          0.048595125553026156
+        ]
+      },
+      "calibrated": {
+        "temperature": 1.4463881414686663,
+        "accuracy": 0.9365,
+        "f1": 0.9373458312777504,
+        "auc": 0.98160283442551,
+        "nll": 0.16967718976246238,
+        "brier": 0.04733801392489059,
+        "ece": 0.019894792547169107
+      },
+      "selective": {
+        "accuracy_at_coverage": {
+          "1.00": 0.9365,
+          "0.90": 0.9722222222222222,
+          "0.80": 0.984375,
+          "0.70": 0.9857142857142858,
+          "0.50": 0.993
+        },
+        "aurc": 0.013273152122914387
+      },
+      "tiers_uncalibrated": {
+        "HIGH": {
+          "share": 0.925,
+          "count": 1850,
+          "accuracy": 0.9675675675675676
+        },
+        "MEDIUM": {
+          "share": 0.0485,
+          "count": 97,
+          "accuracy": 0.5773195876288659
+        },
+        "LOW": {
+          "share": 0.0265,
+          "count": 53,
+          "accuracy": 0.5094339622641509
+        }
+      },
+      "tiers_calibrated": {
+        "HIGH": {
+          "share": 0.8845,
+          "count": 1769,
+          "accuracy": 0.9739966082532504
+        },
+        "MEDIUM": {
+          "share": 0.08,
+          "count": 160,
+          "accuracy": 0.7125
+        },
+        "LOW": {
+          "share": 0.0355,
+          "count": 71,
+          "accuracy": 0.5070422535211268
+        }
+      },
+      "reliability_uncalibrated": [
+        {
+          "low": 0.5,
+          "high": 0.55,
+          "count": 13,
+          "accuracy": 0.46153846153846156,
+          "confidence": 0.5204955043107219
+        },
+        {
+          "low": 0.55,
+          "high": 0.6,
+          "count": 15,
+          "accuracy": 0.5333333333333333,
+          "confidence": 0.573346265528654
+        },
+        {
+          "low": 0.6,
+          "high": 0.65,
+          "count": 11,
+          "accuracy": 0.45454545454545453,
+          "confidence": 0.6213513495222833
+        },
+        {
+          "low": 0.65,
+          "high": 0.7,
+          "count": 14,
+          "accuracy": 0.5714285714285714,
+          "confidence": 0.6724107148735126
+        },
+        {
+          "low": 0.7,
+          "high": 0.75,
+          "count": 13,
+          "accuracy": 0.46153846153846156,
+          "confidence": 0.7285319822998517
+        },
+        {
+          "low": 0.75,
+          "high": 0.8,
+          "count": 13,
+          "accuracy": 0.46153846153846156,
+          "confidence": 0.7775419987795135
+        },
+        {
+          "low": 0.8,
+          "high": 0.8500000000000001,
+          "count": 27,
+          "accuracy": 0.5555555555555556,
+          "confidence": 0.8280671391616428
+        },
+        {
+          "low": 0.8500000000000001,
+          "high": 0.9,
+          "count": 44,
+          "accuracy": 0.6590909090909091,
+          "confidence": 0.881408927148589
+        },
+        {
+          "low": 0.9,
+          "high": 0.95,
+          "count": 57,
+          "accuracy": 0.7894736842105263,
+          "confidence": 0.9264386891091793
+        },
+        {
+          "low": 0.95,
+          "high": 1.0,
+          "count": 1793,
+          "accuracy": 0.9732292247629671,
+          "confidence": 0.9939744058015926
+        }
+      ],
+      "reliability_calibrated": [
+        {
+          "low": 0.5,
+          "high": 0.55,
+          "count": 22,
+          "accuracy": 0.5454545454545454,
+          "confidence": 0.5261281007434655
+        },
+        {
+          "low": 0.55,
+          "high": 0.6,
+          "count": 16,
+          "accuracy": 0.4375,
+          "confidence": 0.5753900903694729
+        },
+        {
+          "low": 0.6,
+          "high": 0.65,
+          "count": 17,
+          "accuracy": 0.5294117647058824,
+          "confidence": 0.6236768382762468
+        },
+        {
+          "low": 0.65,
+          "high": 0.7,
+          "count": 16,
+          "accuracy": 0.5,
+          "confidence": 0.6754711058173674
+        },
+        {
+          "low": 0.7,
+          "high": 0.75,
+          "count": 19,
+          "accuracy": 0.631578947368421,
+          "confidence": 0.7236810811588941
+        },
+        {
+          "low": 0.75,
+          "high": 0.8,
+          "count": 34,
+          "accuracy": 0.47058823529411764,
+          "confidence": 0.7726939658725362
+        },
+        {
+          "low": 0.8,
+          "high": 0.8500000000000001,
+          "count": 51,
+          "accuracy": 0.7647058823529411,
+          "confidence": 0.8216853639072168
+        },
+        {
+          "low": 0.8500000000000001,
+          "high": 0.9,
+          "count": 56,
+          "accuracy": 0.8392857142857143,
+          "confidence": 0.8789992766102256
+        },
+        {
+          "low": 0.9,
+          "high": 0.95,
+          "count": 154,
+          "accuracy": 0.8701298701298701,
+          "confidence": 0.930094875431853
+        },
+        {
+          "low": 0.95,
+          "high": 1.0,
+          "count": 1615,
+          "accuracy": 0.9839009287925696,
+          "confidence": 0.979961573576856
+        }
+      ]
     }
   },
   "comparisons": [
@@ -893,7 +1113,7 @@
       "mcnemar": {
         "only_a_correct": 71,
         "only_b_correct": 67,
-        "p_value": 0.7985445343004951
+        "p_value": 0.7985445343004955
       }
     },
     {
@@ -907,7 +1127,7 @@
       "mcnemar": {
         "only_a_correct": 87,
         "only_b_correct": 62,
-        "p_value": 0.048915157035417815
+        "p_value": 0.04891515703541779
       }
     },
     {
@@ -921,7 +1141,21 @@
       "mcnemar": {
         "only_a_correct": 137,
         "only_b_correct": 94,
-        "p_value": 0.005604072849083904
+        "p_value": 0.005604072849083893
+      }
+    },
+    {
+      "a": "tfidf-lr",
+      "b": "transformer-distilroberta-base",
+      "accuracy_diff": {
+        "diff": -0.051000000000000045,
+        "ci_low": -0.0655,
+        "ci_high": -0.038487499999999994
+      },
+      "mcnemar": {
+        "only_a_correct": 43,
+        "only_b_correct": 145,
+        "p_value": 3.98637863411862e-14
       }
     },
     {
@@ -935,7 +1169,7 @@
       "mcnemar": {
         "only_a_correct": 93,
         "only_b_correct": 72,
-        "p_value": 0.1192051902607031
+        "p_value": 0.1192051902607035
       }
     },
     {
@@ -949,7 +1183,21 @@
       "mcnemar": {
         "only_a_correct": 96,
         "only_b_correct": 57,
-        "p_value": 0.0020248987802002046
+        "p_value": 0.002024898780200205
+      }
+    },
+    {
+      "a": "tfidf-nb",
+      "b": "transformer-distilroberta-base",
+      "accuracy_diff": {
+        "diff": -0.05300000000000005,
+        "ci_low": -0.0665,
+        "ci_high": -0.03949999999999998
+      },
+      "mcnemar": {
+        "only_a_correct": 50,
+        "only_b_correct": 156,
+        "p_value": 6.993759784692382e-14
       }
     },
     {
@@ -963,7 +1211,35 @@
       "mcnemar": {
         "only_a_correct": 104,
         "only_b_correct": 86,
-        "p_value": 0.21735618793934267
+        "p_value": 0.21735618793934283
+      }
+    },
+    {
+      "a": "tfidf-lr+clean",
+      "b": "transformer-distilroberta-base",
+      "accuracy_diff": {
+        "diff": -0.0635,
+        "ci_low": -0.0774999999999999,
+        "ci_high": -0.049000000000000044
+      },
+      "mcnemar": {
+        "only_a_correct": 46,
+        "only_b_correct": 173,
+        "p_value": 1.6430052632768666e-18
+      }
+    },
+    {
+      "a": "tfidf-nb+clean",
+      "b": "transformer-distilroberta-base",
+      "accuracy_diff": {
+        "diff": -0.07250000000000001,
+        "ci_low": -0.08849999999999991,
+        "ci_high": -0.05700000000000005
+      },
+      "mcnemar": {
+        "only_a_correct": 56,
+        "only_b_correct": 201,
+        "p_value": 2.329618933629931e-20
       }
     }
   ]
