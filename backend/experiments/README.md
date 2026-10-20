@@ -62,8 +62,26 @@ machine can be copied back and re-analysed with
 
 ### On Google Colab
 
-Use a T4 runtime, clone the repo, `pip install -r backend/requirements-experiments.txt`, run the
-`hf` command above from `backend/`, then download the run directory.
+Use a GPU runtime (Runtime > Change runtime type > T4 GPU). Colab already ships torch and
+transformers, so only install what is missing:
+
+```bash
+!git clone --branch feat/transformer-baseline https://github.com/Xombi17/reviewlense.git
+%cd reviewlense/backend
+!pip install -q datasets scikit-learn scipy matplotlib pandas
+
+# 1. Add a transformer to the committed 20k baseline run (same splits, so rows are comparable)
+!python -m experiments.run_experiment --data local --models transformer \
+    --model-name distilroberta-base --epochs 2 --merge --out experiments/results/local-tfidf
+
+# 2. Bigger run on Amazon polarity
+!python -m experiments.run_experiment --data hf --n-total 200000 \
+    --models tfidf-lr tfidf-nb transformer --epochs 2 --out experiments/results/hf-200k
+```
+
+Then download `experiments/results/<run>/` (zip it and use `google.colab.files.download`).
+The first run reports the transformer next to the committed TF-IDF rows in one table. If
+`--merge` refuses, the splits differ from the committed run (different `--seed` or data).
 
 ## Tests
 

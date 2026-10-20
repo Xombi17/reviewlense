@@ -6,7 +6,13 @@ pytest.importorskip("transformers")
 
 from backend.experiments.metrics import predict_labels
 from backend.experiments.tiny_model import build_tiny_classifier
-from backend.experiments.transformer import FinetuneConfig, finetune, predict_logits, resolve_device
+from backend.experiments.transformer import (
+    FinetuneConfig,
+    choose_amp_dtype,
+    finetune,
+    predict_logits,
+    resolve_device,
+)
 
 POSITIVE = ["great product love it", "excellent quality works perfectly", "really happy amazing value"]
 NEGATIVE = ["terrible product hate it", "awful quality broke immediately", "really angry waste of money"]
@@ -91,3 +97,16 @@ def test_max_train_samples_limits_training_set(tiny):
                       _config(epochs=1, max_train_samples=20), model=model, tokenizer=tokenizer)
 
     assert result["config"]["n_train_used"] == 20
+
+
+def test_amp_dtype_ignores_emulated_bf16(monkeypatch):
+    # A T4 reports bf16 as supported only through emulation; that must not select bf16.
+    monkeypatch.setattr(
+        torch.cuda,
+        "is_bf16_supported",
+        lambda including_emulation=True: bool(including_emulation),
+    )
+    assert choose_amp_dtype() == torch.float16
+
+    monkeypatch.setattr(torch.cuda, "is_bf16_supported", lambda including_emulation=True: True)
+    assert choose_amp_dtype() == torch.bfloat16

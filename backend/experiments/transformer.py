@@ -75,6 +75,19 @@ def resolve_device(requested: Optional[str] = None) -> torch.device:
     return torch.device("cpu")
 
 
+def choose_amp_dtype() -> torch.dtype:
+    """bf16 only where the GPU supports it natively (Ampere or newer), else fp16.
+
+    ``torch.cuda.is_bf16_supported()`` defaults to counting emulation, which reports True
+    on a T4 (the usual Colab GPU) and would train in slow emulated bf16.
+    """
+    try:
+        native_bf16 = torch.cuda.is_bf16_supported(including_emulation=False)
+    except TypeError:  # older torch without the keyword
+        native_bf16 = torch.cuda.is_available() and torch.cuda.get_device_capability()[0] >= 8
+    return torch.bfloat16 if native_bf16 else torch.float16
+
+
 def _encode(tokenizer, texts: Sequence[str], max_length: int) -> Dict[str, List[List[int]]]:
     return tokenizer(list(texts), truncation=True, max_length=max_length)
 
@@ -180,7 +193,7 @@ def finetune(
     )
 
     on_cuda = device.type == "cuda"
-    amp_dtype = torch.bfloat16 if on_cuda and torch.cuda.is_bf16_supported() else torch.float16
+    amp_dtype = choose_amp_dtype()
     scaler = torch.amp.GradScaler("cuda", enabled=on_cuda and amp_dtype == torch.float16)
 
     history: List[Dict[str, float]] = []
