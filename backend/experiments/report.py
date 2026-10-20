@@ -266,13 +266,29 @@ def render_markdown(meta: dict, analysis: dict) -> str:
     add("![Reliability diagrams](reliability.png)")
     add("")
 
+    variance_groups = [group for group in seed_groups(meta) if len(group["seeds"]) >= 2]
+    # Rows from extra training seeds repeat the same comparison; keep one primary row per group.
+    hidden: set = set()
+    for group in variance_groups:
+        primary = next(iter(group["seeds"].values()))
+        hidden.update(name for name in group["seeds"].values() if name != primary)
+        hidden.update(repeat for repeat, _ in group["repeats"])
+
     add("## Pairwise comparison")
     add("")
     add("Accuracy(A) - Accuracy(B) with a paired bootstrap interval, and an exact McNemar test on the reviews where exactly one model is right.")
+    if hidden:
+        add("")
+        add(
+            "Rows from additional training seeds are left out to keep the table readable "
+            "(they are in `results.json`); see Seed variance for how much seeds differ."
+        )
     add("")
     add("| A | B | Delta accuracy | only A right | only B right | McNemar p |")
     add("| :-- | :-- | :-- | :-- | :-- | :-- |")
     for comparison in analysis["comparisons"]:
+        if comparison["a"] in hidden or comparison["b"] in hidden:
+            continue
         diff, test = comparison["accuracy_diff"], comparison["mcnemar"]
         add(
             f"| {comparison['a']} | {comparison['b']} | "
@@ -281,7 +297,6 @@ def render_markdown(meta: dict, analysis: dict) -> str:
         )
     add("")
 
-    variance_groups = [group for group in seed_groups(meta) if len(group["seeds"]) >= 2]
     if variance_groups:
         add("## Seed variance")
         add("")
@@ -303,6 +318,18 @@ def render_markdown(meta: dict, analysis: dict) -> str:
             add(f"| ECE (raw) | {_mean_sd([row['uncalibrated']['ece'] for row in rows])} |")
             add(f"| Fitted temperature T | {_mean_sd([row['calibrated']['temperature'] for row in rows])} |")
             add("")
+            within = [
+                comparison for comparison in analysis["comparisons"]
+                if comparison["a"] in names and comparison["b"] in names
+            ]
+            if within:
+                largest = max(abs(comparison["accuracy_diff"]["diff"]) for comparison in within)
+                smallest_p = min(comparison["mcnemar"]["p_value"] for comparison in within)
+                add(
+                    f"Across the {len(within)} pairs of seeds, the largest accuracy difference is "
+                    f"{largest:.4f} and the smallest McNemar p-value is {smallest_p:.3g}."
+                )
+                add("")
             for repeat, original in group["repeats"]:
                 delta = abs(
                     analysis["models"][repeat]["uncalibrated"]["accuracy"]
@@ -326,7 +353,13 @@ def render_markdown(meta: dict, analysis: dict) -> str:
     add(json.dumps({name: meta["models"][name].get("versions", {}) for name in models}, indent=2))
     add("```")
     add("")
-    add("One training seed per model; no variance across seeds is reported.")
+    if variance_groups:
+        add(
+            "Seed variance is measured for the fine-tuned rows above. TF-IDF rows are deterministic "
+            "given the data, so they have one run each."
+        )
+    else:
+        add("One training seed per model; no variance across seeds is reported.")
     add("")
     return "\n".join(lines)
 
