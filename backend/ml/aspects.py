@@ -73,7 +73,7 @@ _DEFAULT_EXTRACTOR = None
 def _get_default_extractor() -> "AspectExtractor":
     global _DEFAULT_EXTRACTOR
     if _DEFAULT_EXTRACTOR is None:
-        from backend.ml.predictor import _get_default_predictor
+        from .predictor import _get_default_predictor
 
         _DEFAULT_EXTRACTOR = AspectExtractor(_get_default_predictor())
     return _DEFAULT_EXTRACTOR

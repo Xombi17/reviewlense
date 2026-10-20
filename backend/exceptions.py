@@ -1,8 +1,12 @@
 """Custom exceptions and standardized error responses for the API."""
 
+import logging
+
 from fastapi import Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+
+logger = logging.getLogger(__name__)
 
 
 class APIError(Exception):
@@ -72,8 +76,13 @@ async def request_validation_error_handler(
 
 
 async def unhandled_exception_handler(_: Request, exc: Exception) -> JSONResponse:
-    """Prevent raw FastAPI exception payloads from leaking to clients."""
+    """Log the real error server-side and return a generic message to clients."""
+    logger.error("Unhandled exception", exc_info=exc)
     return JSONResponse(
         status_code=500,
-        content={"error": True, "code": "INTERNAL_ERROR", "message": str(exc)},
+        content={
+            "error": True,
+            "code": APIError.code,
+            "message": APIError.message,
+        },
     )

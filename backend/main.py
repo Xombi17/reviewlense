@@ -65,7 +65,7 @@ allow_origins = os.getenv("ALLOW_ORIGINS", "http://localhost:3000").split(",")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allow_origins,
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -78,3 +78,9 @@ app.include_router(stats.router, tags=["stats"])
 @app.get("/")
 async def root():
     return {"message": "Welcome to the ReviewLens AI API!"}
+
+
+@app.get("/health")
+async def health():
+    """Liveness probe used by the Docker HEALTHCHECK and Railway."""
+    return {"status": "healthy", "service": "reviewlens-ai-api"}
