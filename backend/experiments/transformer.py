@@ -5,10 +5,12 @@ on CUDA, and best-epoch selection on the validation split. The model is reduced 
 same log-odds interface as the classical baselines (``logit[1] - logit[0]``).
 """
 
+import json
+import os
 import random
 import time
 from dataclasses import asdict, dataclass
-from typing import Dict, List, Optional, Sequence
+from typing import Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 import torch
@@ -155,11 +157,14 @@ def finetune(
     cfg: FinetuneConfig,
     model=None,
     tokenizer=None,
+    save_dir: Optional[str] = None,
 ) -> Dict[str, object]:
     """Fine-tune, keep the best epoch by validation accuracy, return val/test log-odds.
 
     ``model`` and ``tokenizer`` can be injected (used by tests and offline smoke runs);
     otherwise they are loaded from ``cfg.model_name`` (hub id or local directory).
+    ``cfg.seed`` is the training seed (classifier-head init, batch order, dropout); the data
+    split has its own seed. With ``save_dir`` the best-epoch model and tokenizer are written there.
     """
     set_seed(cfg.seed)
     device = resolve_device(cfg.device)
@@ -239,6 +244,10 @@ def finetune(
 
     train_seconds = time.time() - train_started
     model.load_state_dict(best_state)
+    if save_dir:
+        os.makedirs(save_dir, exist_ok=True)
+        model.save_pretrained(save_dir)
+        tokenizer.save_pretrained(save_dir)
 
     best_val_logits = predict_logits(model, tokenizer, val_text, cfg, device)
     inference_started = time.time()
@@ -251,6 +260,7 @@ def finetune(
         "config": {
             **asdict(cfg),
             "device": str(device),
+            "train_seed": cfg.seed,
             "best_epoch": best_epoch,
             "n_parameters": int(sum(p.numel() for p in model.parameters())),
             "n_train_used": len(train_text),
@@ -259,3 +269,59 @@ def finetune(
         "train_seconds": train_seconds,
         "inference_seconds": inference_seconds,
     }
+
+
+CALIBRATION_FILE = "calibration.json"
+
+
+def write_calibration(save_dir: str, temperature: float, details: Dict[str, object]) -> str:
+    """Store the validation-fitted temperature next to the weights it belongs to.
+
+    The score a classifier produces is ``logit[1] - logit[0]``; calibrated probability of the
+    positive class is ``sigmoid(score / temperature)``.
+    """
+    payload = {
+        "temperature": float(temperature),
+        "score": "logit[1] - logit[0]",
+        "positive_class_index": 1,
+        "fit_on": "validation",
+        **details,
+    }
+    path = os.path.join(save_dir, CALIBRATION_FILE)
+    with open(path, "w", encoding="utf-8") as handle:
+        json.dump(payload, handle, indent=2)
+    return path
+
+
+def load_saved_classifier(save_dir: str) -> Tuple[object, object, Dict[str, object]]:
+    """Reload a model written by ``finetune(save_dir=...)`` with its tokenizer and calibration."""
+    tokenizer = AutoTokenizer.from_pretrained(save_dir)
+    model = AutoModelForSequenceClassification.from_pretrained(save_dir)
+    with open(os.path.join(save_dir, CALIBRATION_FILE), "r", encoding="utf-8") as handle:
+        calibration = json.load(handle)
+    return model, tokenizer, calibration
+
+
+def verify_saved_classifier(
+    save_dir: str,
+    texts: Sequence[str],
+    expected_logits: np.ndarray,
+    cfg: FinetuneConfig,
+    atol: float = 1e-3,
+) -> float:
+    """Reload from disk and check the logits match the in-memory model; returns the max difference.
+
+    Raises if they differ, so a corrupt or incomplete save is caught at training time rather
+    than when the model is first served.
+    """
+    model, tokenizer, _ = load_saved_classifier(save_dir)
+    device = resolve_device(cfg.device)
+    model.to(device)
+    reloaded = predict_logits(model, tokenizer, list(texts), cfg, device)
+    worst = float(np.max(np.abs(reloaded - np.asarray(expected_logits)[: len(texts)])))
+    if worst > atol:
+        raise RuntimeError(
+            f"Saved model in {save_dir} does not reproduce the trained model's logits "
+            f"(max abs difference {worst:.2e} > {atol:.0e})"
+        )
+    return worst

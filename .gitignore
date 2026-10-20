@@ -15,6 +15,10 @@ __pycache__/
 # backend/models/*.pkl
 # backend/models/*.joblib
 
+# Fine-tuned transformer weights (~330 MB, over GitHub's 100 MB file limit)
+backend/models/transformer*/
+backend/experiments/saved_models/
+
 # Large raw datasets (downloaded from Kaggle)
 backend/data/raw/*
 !backend/data/raw/.gitkeep

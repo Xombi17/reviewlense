@@ -94,6 +94,34 @@ Then download `experiments/results/<run>/` (zip it and use `google.colab.files.d
 The first run reports the transformer next to the committed TF-IDF rows in one table. If
 `--merge` refuses, the splits differ from the committed run (different `--seed` or data).
 
+### Seed variance and saving the model
+
+`--seed` fixes the data sample and split. `--train-seed` fixes model training (classifier-head
+initialisation, batch order, dropout) and defaults to `--seed`. Changing only `--train-seed`
+trains on identical splits, so differences between rows are seed variance:
+
+```bash
+python -m experiments.run_experiment --data local --models transformer \
+    --train-seed 1 --tag s1 --merge --out experiments/results/local-tfidf
+```
+
+Rows that share a configuration but differ in training seed get a **Seed variance** section
+(mean ± sample standard deviation). A row that repeats an already-counted seed is reported as a
+run-to-run reproducibility check instead and is kept out of the spread.
+
+`--save-model DIR` writes the best-epoch model and tokenizer to `DIR`, plus `calibration.json`
+holding the temperature fitted on validation (calibrated probability of the positive class is
+`sigmoid((logit[1] - logit[0]) / temperature)`). The run then reloads the saved model and checks it
+reproduces the trained model's logits on 256 test reviews, and fails if not.
+
+```bash
+python -m experiments.run_experiment --data hf --n-total 200000 --models transformer \
+    --tag saved --merge --save-model /path/to/transformer-200k --out experiments/results/hf-200k
+```
+
+Saved weights are about 330 MB, over GitHub's 100 MB file limit. Keep them on Drive or the
+Hugging Face hub, not in git (`backend/models/transformer*/` is ignored).
+
 ## Tests
 
 `pytest` covers the metrics against known values (including recovering a known temperature), split

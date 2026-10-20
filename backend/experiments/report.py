@@ -122,6 +122,37 @@ def _plot_risk_coverage(meta: dict, analysis: dict, path: str) -> None:
     plt.close(figure)
 
 
+def seed_groups(meta: dict) -> List[dict]:
+    """Group fine-tuned rows that share a configuration but differ in training seed.
+
+    Each seed is counted once. A row that repeats an already-seen seed is a re-run of the same
+    configuration (a reproducibility check), so it is reported separately and kept out of the
+    spread. Rows from before ``train_seed`` existed fall back to their ``seed`` field.
+    """
+    groups: Dict[tuple, dict] = {}
+    for name, info in meta["models"].items():
+        config = info["config"]
+        if "model_name" not in config:
+            continue
+        key = (
+            config["model_name"], config["learning_rate"], config["epochs"],
+            config["max_length"], config["batch_size"], config.get("max_train_samples"),
+        )
+        group = groups.setdefault(key, {"label": f"{config['model_name']} ({config['epochs']} epochs, lr {config['learning_rate']})", "seeds": {}, "repeats": []})
+        seed = config.get("train_seed", config.get("seed"))
+        if seed in group["seeds"]:
+            group["repeats"].append((name, group["seeds"][seed]))
+        else:
+            group["seeds"][seed] = name
+    return list(groups.values())
+
+
+def _mean_sd(values) -> str:
+    values = np.asarray(values, dtype=float)
+    spread = values.std(ddof=1) if len(values) > 1 else float("nan")
+    return f"{values.mean():.4f} ± {spread:.4f} (min {values.min():.4f}, max {values.max():.4f})"
+
+
 def _fmt_ci(value: float, ci, digits: int = 4) -> str:
     return f"{value:.{digits}f} [{ci[0]:.{digits}f}, {ci[1]:.{digits}f}]"
 
@@ -249,6 +280,39 @@ def render_markdown(meta: dict, analysis: dict) -> str:
             f"{test['only_a_correct']} | {test['only_b_correct']} | {test['p_value']:.4g} |"
         )
     add("")
+
+    variance_groups = [group for group in seed_groups(meta) if len(group["seeds"]) >= 2]
+    if variance_groups:
+        add("## Seed variance")
+        add("")
+        add(
+            "Same splits and hyperparameters, different training seed (classifier-head initialisation, "
+            "batch order, dropout). Mean ± sample standard deviation across seeds."
+        )
+        add("")
+        for group in variance_groups:
+            names = list(group["seeds"].values())
+            seeds = list(group["seeds"].keys())
+            rows = [analysis["models"][name] for name in names]
+            add(f"**{group['label']}**, {len(seeds)} seeds ({', '.join(str(seed) for seed in seeds)}):")
+            add("")
+            add("| Metric | Across seeds |")
+            add("| :-- | :-- |")
+            add(f"| Accuracy | {_mean_sd([row['uncalibrated']['accuracy'] for row in rows])} |")
+            add(f"| AUC | {_mean_sd([row['uncalibrated']['auc'] for row in rows])} |")
+            add(f"| ECE (raw) | {_mean_sd([row['uncalibrated']['ece'] for row in rows])} |")
+            add(f"| Fitted temperature T | {_mean_sd([row['calibrated']['temperature'] for row in rows])} |")
+            add("")
+            for repeat, original in group["repeats"]:
+                delta = abs(
+                    analysis["models"][repeat]["uncalibrated"]["accuracy"]
+                    - analysis["models"][original]["uncalibrated"]["accuracy"]
+                )
+                add(
+                    f"`{repeat}` re-ran the configuration of `{original}` with the same seed; "
+                    f"accuracy differs by {delta:.4f}, which is run-to-run nondeterminism, not seed variance."
+                )
+                add("")
 
     add("## Setup")
     add("")
