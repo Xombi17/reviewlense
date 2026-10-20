@@ -95,8 +95,11 @@ async function retryWithBackoff<T>(
       }
     }
   }
-  // All retries exhausted — show connection error
-  throw new Error("Connection lost. Check your internet and try again.");
+  // All retries exhausted. A browser reports a CORS block the same way as a dead
+  // server, so name the likely causes instead of blaming the user's internet.
+  throw new Error(
+    `Cannot reach the API at ${API_BASE}. Check that the backend is running and that it allows this site's origin (ALLOW_ORIGINS).`
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -168,6 +171,7 @@ export async function fetchModels(): Promise<ModelInfo[]> {
     const body = (await response.json()) as ModelsResponse;
     return body.models.length > 0 ? body.models : FALLBACK_MODELS;
   } catch {
+    console.warn(`Could not load ${API_BASE}/models; showing the default models only.`);
     return FALLBACK_MODELS;
   }
 }
