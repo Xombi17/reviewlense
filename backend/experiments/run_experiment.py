@@ -75,6 +75,8 @@ def parse_args(argv=None) -> argparse.Namespace:
     tfidf = parser.add_argument_group("tf-idf baselines")
     tfidf.add_argument("--preprocess", choices=("raw", "clean"), default="raw")
     tfidf.add_argument("--max-features", type=int, default=100_000)
+    tfidf.add_argument("--lr-c-grid", type=float, nargs="+", default=None, help="Logistic regression C values to try")
+    tfidf.add_argument("--nb-alpha-grid", type=float, nargs="+", default=None, help="Naive Bayes alpha values to try")
 
     transformer = parser.add_argument_group("transformer")
     transformer.add_argument("--model-name", default="distilroberta-base", help="Hub id or local directory")
@@ -119,6 +121,11 @@ def main(argv=None) -> str:
         baselines = run_tfidf_baselines(
             splits.train["text"], y_train, splits.val["text"], y_val, splits.test["text"],
             preprocess=args.preprocess, max_features=args.max_features, seed=args.seed,
+            **{
+                key: value
+                for key, value in (("lr_c_grid", args.lr_c_grid), ("nb_alpha_grid", args.nb_alpha_grid))
+                if value is not None
+            },
         )
         new_results.update({name: baselines[name] for name in args.models if name in baselines})
 

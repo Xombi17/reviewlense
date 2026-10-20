@@ -167,6 +167,18 @@ def render_markdown(meta: dict, analysis: dict) -> str:
         "better). T is the temperature fitted on validation; T > 1 means the raw model was overconfident."
     )
     add("")
+    edge_models = [
+        name for name in models if meta["models"][name]["config"].get("at_grid_edge")
+    ]
+    for name in edge_models:
+        config = meta["models"][name]["config"]
+        chosen = config.get("C", config.get("alpha"))
+        add(
+            f"> **{name}** picked {chosen} at the edge of its search grid "
+            f"({min(config['grid'])} to {max(config['grid'])}), so a better value may lie outside "
+            "it and this baseline may be slightly under-tuned."
+        )
+        add("")
 
     add("## Cost")
     add("")

@@ -74,10 +74,21 @@ transformers, so only install what is missing:
 !python -m experiments.run_experiment --data local --models transformer \
     --model-name distilroberta-base --epochs 2 --merge --out experiments/results/local-tfidf
 
-# 2. Bigger run on Amazon polarity
+# 2. Bigger run on Amazon polarity (200k reviews: about 160k train, 20k val, 20k test)
 !python -m experiments.run_experiment --data hf --n-total 200000 \
-    --models tfidf-lr tfidf-nb transformer --epochs 2 --out experiments/results/hf-200k
+    --models tfidf-lr tfidf-nb transformer --epochs 2 \
+    --lr-c-grid 2 8 32 128 --nb-alpha-grid 0.1 0.3 1 3 \
+    --note "200k-review Amazon polarity sample from the Hugging Face hub." \
+    --out experiments/results/hf-200k
+
+# 3. Optional ablation on the same run: production NLTK cleaning
+!python -m experiments.run_experiment --data hf --n-total 200000 --models tfidf-lr tfidf-nb \
+    --preprocess clean --tag clean --merge --lr-c-grid 2 8 32 128 --nb-alpha-grid 0.1 0.3 1 3 \
+    --out experiments/results/hf-200k
 ```
+
+`--lr-c-grid` and `--nb-alpha-grid` widen the classical baselines' search. The report adds a
+warning under the accuracy table when a baseline still picks the edge of its grid.
 
 Then download `experiments/results/<run>/` (zip it and use `google.colab.files.download`).
 The first run reports the transformer next to the committed TF-IDF rows in one table. If
@@ -98,6 +109,9 @@ nothing about real transformer quality.
 - **No fine-tuned transformer result exists yet.** The environment this was built in could not
   reach huggingface.co, so the transformer path is tested only on the tiny offline model and the
   `--data hf` path has not been run.
+- Widening the baselines' grids on the 20k data (C up to 512, alpha up to 10) selected the same
+  values (C = 32, alpha = 1.0) with identical test accuracy, so edge-of-grid selection did not
+  under-tune them there. This has not been checked at 200k.
 - Binary labels only (Amazon polarity drops 3-star reviews); a neutral class is future work.
 - One training seed per model. Differences smaller than seed-to-seed variance are not detectable.
 - Pairwise p-values are not corrected for multiple comparisons.
