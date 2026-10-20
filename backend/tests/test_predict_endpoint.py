@@ -45,3 +45,23 @@ async def test_predict_endpoint_invalid_model_error(api_client):
 
     assert response.status_code == 400
     assert response.json()["code"] == "MODEL_NOT_FOUND"
+
+
+@pytest.mark.anyio
+async def test_transformer_is_rejected_when_not_configured(api_client):
+    response = await api_client.post(
+        "/predict", json={"review": "Solid sound quality overall.", "model": "transformer"}
+    )
+
+    assert response.status_code == 400
+    body = response.json()
+    assert body["code"] == "MODEL_NOT_FOUND"
+    assert "Available: ['lr', 'nb']" in body["message"]
+
+
+@pytest.mark.anyio
+async def test_models_endpoint_lists_only_the_tfidf_models_by_default(api_client):
+    payload = (await api_client.get("/models")).json()
+
+    assert [model["id"] for model in payload["models"]] == ["lr", "nb"]
+    assert not any(model["calibrated"] for model in payload["models"])

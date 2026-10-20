@@ -1,0 +1,133 @@
+{
+  "models": {
+    "tfidf-lr": {
+      "config": {
+        "preprocess": "raw",
+        "max_features": 100000,
+        "C": 4.0,
+        "grid": [
+          0.25,
+          0.5,
+          1.0,
+          2.0,
+          4.0,
+          8.0,
+          32.0
+        ],
+        "at_grid_edge": false,
+        "val_accuracy_at_selection": 0.9256925692569257
+      },
+      "train_seconds": 42.302337408065796,
+      "inference_seconds": 2.400022029876709,
+      "n_parameters": null,
+      "hardware": "x86_64, 2 CPU threads, CPU only",
+      "versions": {
+        "python": "3.13.15",
+        "scikit-learn": "1.6.1",
+        "numpy": "2.1.3",
+        "torch": "2.11.0+cu130",
+        "transformers": "5.20.1"
+      }
+    },
+    "tfidf-nb": {
+      "config": {
+        "preprocess": "raw",
+        "max_features": 100000,
+        "alpha": 0.01,
+        "grid": [
+          0.01,
+          0.03,
+          0.1,
+          0.3,
+          1.0
+        ],
+        "at_grid_edge": true,
+        "val_accuracy_at_selection": 0.8943394339433943
+      },
+      "train_seconds": 35.54940581321716,
+      "inference_seconds": 2.4016106128692627,
+      "n_parameters": null,
+      "hardware": "x86_64, 2 CPU threads, CPU only",
+      "versions": {
+        "python": "3.13.15",
+        "scikit-learn": "1.6.1",
+        "numpy": "2.1.3",
+        "torch": "2.11.0+cu130",
+        "transformers": "5.20.1"
+      }
+    },
+    "transformer-distilroberta-base": {
+      "config": {
+        "model_name": "distilroberta-base",
+        "max_length": 256,
+        "batch_size": 32,
+        "eval_batch_size": 128,
+        "learning_rate": 2e-05,
+        "epochs": 2,
+        "warmup_ratio": 0.06,
+        "weight_decay": 0.01,
+        "max_grad_norm": 1.0,
+        "seed": 42,
+        "max_train_samples": null,
+        "device": "cuda",
+        "log_every": 100,
+        "best_epoch": 2,
+        "n_parameters": 82119938,
+        "n_train_used": 159980
+      },
+      "train_seconds": 1936.4211587905884,
+      "inference_seconds": 65.98187828063965,
+      "n_parameters": 82119938,
+      "hardware": "x86_64, 2 CPU threads, GPU Tesla T4",
+      "versions": {
+        "python": "3.13.15",
+        "scikit-learn": "1.6.1",
+        "numpy": "2.1.3",
+        "torch": "2.11.0+cu130",
+        "transformers": "5.20.1"
+      }
+    },
+    "transformer-distilroberta-base+saved": {
+      "config": {
+        "model_name": "distilroberta-base",
+        "max_length": 256,
+        "batch_size": 32,
+        "eval_batch_size": 128,
+        "learning_rate": 2e-05,
+        "epochs": 2,
+        "warmup_ratio": 0.06,
+        "weight_decay": 0.01,
+        "max_grad_norm": 1.0,
+        "seed": 42,
+        "max_train_samples": null,
+        "device": "cuda",
+        "log_every": 100,
+        "train_seed": 42,
+        "best_epoch": 2,
+        "n_parameters": 82119938,
+        "n_train_used": 159980,
+        "data_seed": 42
+      },
+      "train_seconds": 1931.8796210289001,
+      "inference_seconds": 65.7998034954071,
+      "n_parameters": 82119938,
+      "hardware": "x86_64, 2 CPU threads, GPU Tesla T4",
+      "versions": {
+        "python": "3.13.15",
+        "scikit-learn": "1.6.1",
+        "numpy": "2.1.3",
+        "torch": "2.11.0+cu130",
+        "transformers": "5.20.1"
+      }
+    }
+  },
+  "data_source": "hf",
+  "seed": 42,
+  "split_sizes": {
+    "train": 159980,
+    "val": 19998,
+    "test": 19998
+  },
+  "split_fingerprint": "5e9d4ef3679e",
+  "note": "200k-review Amazon polarity sample from the Hugging Face hub."
+}

@@ -66,12 +66,26 @@ For step-by-step guides and detailed reference manuals, please refer to the foll
 
 ## 🚀 Quick Start (Development Mode)
 
+### 0. One-time backend setup
+Works on Python 3.12 through 3.14.
+```bash
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-local.txt
+python -c "import nltk; [nltk.download(p) for p in ('punkt_tab', 'punkt', 'stopwords', 'wordnet')]"
+PYTHONPATH=. python -c "from ml.preprocessing import clean_review_text; print(clean_review_text('The battery is great but the mic is bad!'))"
+```
+The last command should print `battery great mic bad`; if it raises a `LookupError`, the NLTK data did not download. NLTK may warn that `~/nltk_data` is group-writable. That is advisory and does not stop the download; `chmod -R go-w ~/nltk_data` silences it.
+
+`requirements-local.txt` installs only what the API needs and leaves numpy and pandas unpinned, because the exact pins in `requirements.txt` and `requirements-vercel.txt` (numpy 1.26.4, pandas 2.2.2) have no wheels for Python 3.13+. Those pinned files are for the Vercel and Docker builds. The full `requirements.txt` also adds the training and notebook tools.
+
 ### 1. Start the Backend API
 Navigate to `/backend` directory, activate virtual environment, and run:
 ```bash
 cd backend
 source .venv/bin/activate
-PYTHONPATH=. uvicorn main:app --reload --port 8000
+PYTHONPATH=. python -m uvicorn main:app --reload --port 8000
 ```
 Interactive API docs are available at [http://localhost:8000/docs](http://localhost:8000/docs).
 
@@ -83,6 +97,14 @@ npm install
 npm run dev
 ```
 The client UI will run on [http://localhost:3000](http://localhost:3000).
+
+### Optional: the fine-tuned transformer
+A fine-tuned DistilRoBERTa beat the TF-IDF models by 3.6 points of accuracy on a 200k-review Amazon sample (see `backend/experiments/results/hf-200k/report.md`). The API serves it as a third model when it is configured:
+```bash
+pip install -r backend/requirements-transformer.txt
+TRANSFORMER_MODEL=/path/to/saved/model PYTHONPATH=. python -m uvicorn main:app --port 8000
+```
+The model folder comes from `python -m experiments.run_experiment --save-model DIR` (see `backend/experiments/README.md`) and includes the calibration that makes its confidence meaningful. Without `TRANSFORMER_MODEL` the API serves the TF-IDF models only. Details are in `docs/api-reference.md`.
 
 ### 3. Run Test Suites
 Verify that everything is set up correctly by running tests:

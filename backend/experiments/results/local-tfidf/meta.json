@@ -1,0 +1,219 @@
+{
+  "models": {
+    "tfidf-lr": {
+      "config": {
+        "preprocess": "raw",
+        "max_features": 100000,
+        "C": 32.0,
+        "val_accuracy_at_selection": 0.897
+      },
+      "train_seconds": 4.807710886001587,
+      "inference_seconds": 0.23273396492004395,
+      "n_parameters": null,
+      "hardware": "x86_64, 4 CPU threads, no GPU",
+      "versions": {
+        "python": "3.12.3",
+        "scikit-learn": "1.9.0",
+        "numpy": "2.5.4",
+        "torch": "2.14.1+cu130",
+        "transformers": "5.20.2"
+      }
+    },
+    "tfidf-nb": {
+      "config": {
+        "preprocess": "raw",
+        "max_features": 100000,
+        "alpha": 1.0,
+        "val_accuracy_at_selection": 0.883
+      },
+      "train_seconds": 4.526117324829102,
+      "inference_seconds": 0.2350931167602539,
+      "n_parameters": null,
+      "hardware": "x86_64, 4 CPU threads, no GPU",
+      "versions": {
+        "python": "3.12.3",
+        "scikit-learn": "1.9.0",
+        "numpy": "2.5.4",
+        "torch": "2.14.1+cu130",
+        "transformers": "5.20.2"
+      }
+    },
+    "tfidf-lr+clean": {
+      "config": {
+        "preprocess": "clean",
+        "max_features": 100000,
+        "C": 2.0,
+        "val_accuracy_at_selection": 0.892
+      },
+      "train_seconds": 14.834755659103394,
+      "inference_seconds": 0.14380168914794922,
+      "n_parameters": null,
+      "hardware": "x86_64, 4 CPU threads, no GPU",
+      "versions": {
+        "python": "3.12.3",
+        "scikit-learn": "1.9.0",
+        "numpy": "2.5.4",
+        "torch": "2.14.1+cu130",
+        "transformers": "5.20.2"
+      }
+    },
+    "tfidf-nb+clean": {
+      "config": {
+        "preprocess": "clean",
+        "max_features": 100000,
+        "alpha": 0.3,
+        "val_accuracy_at_selection": 0.8795
+      },
+      "train_seconds": 14.688384771347046,
+      "inference_seconds": 0.14496803283691406,
+      "n_parameters": null,
+      "hardware": "x86_64, 4 CPU threads, no GPU",
+      "versions": {
+        "python": "3.12.3",
+        "scikit-learn": "1.9.0",
+        "numpy": "2.5.4",
+        "torch": "2.14.1+cu130",
+        "transformers": "5.20.2"
+      }
+    },
+    "transformer-distilroberta-base": {
+      "config": {
+        "model_name": "distilroberta-base",
+        "max_length": 256,
+        "batch_size": 32,
+        "eval_batch_size": 128,
+        "learning_rate": 2e-05,
+        "epochs": 2,
+        "warmup_ratio": 0.06,
+        "weight_decay": 0.01,
+        "max_grad_norm": 1.0,
+        "seed": 42,
+        "max_train_samples": null,
+        "device": "cuda",
+        "log_every": 100,
+        "best_epoch": 2,
+        "n_parameters": 82119938,
+        "n_train_used": 15993
+      },
+      "train_seconds": 195.0166654586792,
+      "inference_seconds": 7.1547017097473145,
+      "n_parameters": 82119938,
+      "hardware": "x86_64, 2 CPU threads, GPU Tesla T4",
+      "versions": {
+        "python": "3.13.15",
+        "scikit-learn": "1.6.1",
+        "numpy": "2.1.3",
+        "torch": "2.11.0+cu130",
+        "transformers": "5.20.1"
+      }
+    },
+    "transformer-distilroberta-base+s1": {
+      "config": {
+        "model_name": "distilroberta-base",
+        "max_length": 256,
+        "batch_size": 32,
+        "eval_batch_size": 128,
+        "learning_rate": 2e-05,
+        "epochs": 2,
+        "warmup_ratio": 0.06,
+        "weight_decay": 0.01,
+        "max_grad_norm": 1.0,
+        "seed": 1,
+        "max_train_samples": null,
+        "device": "cuda",
+        "log_every": 100,
+        "train_seed": 1,
+        "best_epoch": 2,
+        "n_parameters": 82119938,
+        "n_train_used": 15993,
+        "data_seed": 42
+      },
+      "train_seconds": 183.04601311683655,
+      "inference_seconds": 6.768649578094482,
+      "n_parameters": 82119938,
+      "hardware": "x86_64, 2 CPU threads, GPU Tesla T4",
+      "versions": {
+        "python": "3.13.15",
+        "scikit-learn": "1.6.1",
+        "numpy": "2.1.3",
+        "torch": "2.11.0+cu130",
+        "transformers": "5.20.1"
+      }
+    },
+    "transformer-distilroberta-base+s2": {
+      "config": {
+        "model_name": "distilroberta-base",
+        "max_length": 256,
+        "batch_size": 32,
+        "eval_batch_size": 128,
+        "learning_rate": 2e-05,
+        "epochs": 2,
+        "warmup_ratio": 0.06,
+        "weight_decay": 0.01,
+        "max_grad_norm": 1.0,
+        "seed": 2,
+        "max_train_samples": null,
+        "device": "cuda",
+        "log_every": 100,
+        "train_seed": 2,
+        "best_epoch": 2,
+        "n_parameters": 82119938,
+        "n_train_used": 15993,
+        "data_seed": 42
+      },
+      "train_seconds": 191.20906114578247,
+      "inference_seconds": 7.019279956817627,
+      "n_parameters": 82119938,
+      "hardware": "x86_64, 2 CPU threads, GPU Tesla T4",
+      "versions": {
+        "python": "3.13.15",
+        "scikit-learn": "1.6.1",
+        "numpy": "2.1.3",
+        "torch": "2.11.0+cu130",
+        "transformers": "5.20.1"
+      }
+    },
+    "transformer-distilroberta-base+s3": {
+      "config": {
+        "model_name": "distilroberta-base",
+        "max_length": 256,
+        "batch_size": 32,
+        "eval_batch_size": 128,
+        "learning_rate": 2e-05,
+        "epochs": 2,
+        "warmup_ratio": 0.06,
+        "weight_decay": 0.01,
+        "max_grad_norm": 1.0,
+        "seed": 3,
+        "max_train_samples": null,
+        "device": "cuda",
+        "log_every": 100,
+        "train_seed": 3,
+        "best_epoch": 1,
+        "n_parameters": 82119938,
+        "n_train_used": 15993,
+        "data_seed": 42
+      },
+      "train_seconds": 192.00336456298828,
+      "inference_seconds": 7.0624566078186035,
+      "n_parameters": 82119938,
+      "hardware": "x86_64, 2 CPU threads, GPU Tesla T4",
+      "versions": {
+        "python": "3.13.15",
+        "scikit-learn": "1.6.1",
+        "numpy": "2.1.3",
+        "torch": "2.11.0+cu130",
+        "transformers": "5.20.1"
+      }
+    }
+  },
+  "data_source": "local",
+  "seed": 42,
+  "split_sizes": {
+    "train": 15993,
+    "val": 2000,
+    "test": 2000
+  },
+  "split_fingerprint": "fbed469f9cc2",
+  "note": "Development subset: 20k reviews from test_csvs/all_reviews_raw.csv, not the 1M-review training set. Use for pipeline validation, not for headline claims. '+clean' rows apply the production clean_review_text preprocessing (stopword removal, lemmatization); the others use raw text."
+}

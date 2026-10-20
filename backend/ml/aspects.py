@@ -1,7 +1,7 @@
 """Keyword-based aspect extraction across 8 categories with sentence-level prediction and lazy singleton access."""
 
 import re
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
 import nltk
 
@@ -36,8 +36,8 @@ class AspectExtractor:
             except LookupError:
                 sentences = text.split(".")
 
-        results: List[Dict[str, Any]] = []
-
+        # First sentence per aspect that mentions it and has content after cleaning.
+        selected: List[Tuple[str, str]] = []
         for aspect_name, keywords in ASPECT_KEYWORDS.items():
             for sentence in sentences:
                 lower_sentence = sentence.lower()
@@ -48,23 +48,23 @@ class AspectExtractor:
                 if not keyword_matched:
                     continue
 
-                cleaned_sentence = clean_review_text(sentence)
-                if cleaned_sentence == "":
+                if clean_review_text(sentence) == "":
                     continue
 
-                prediction = self.predictor.predict_sentiment(
-                    cleaned_sentence, model_name=model_name
-                )
-                results.append(
-                    {
-                        "aspect": aspect_name,
-                        "sentiment": prediction["sentiment"],
-                        "confidence": prediction["confidence"],
-                    }
-                )
+                selected.append((aspect_name, sentence))
                 break
 
-        return results
+        predictions = self.predictor.predict_reviews(
+            [sentence for _, sentence in selected], model_name=model_name
+        )
+        return [
+            {
+                "aspect": aspect_name,
+                "sentiment": prediction["sentiment"],
+                "confidence": prediction["confidence"],
+            }
+            for (aspect_name, _), prediction in zip(selected, predictions)
+        ]
 
 
 _DEFAULT_EXTRACTOR = None

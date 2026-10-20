@@ -1,0 +1,14 @@
+# Run the API locally on any recent Python (3.12 through 3.14 tested).
+# The Vercel and Docker builds use the exact pins in requirements-vercel.txt / requirements.txt
+# instead; those pins (numpy 1.26.4, pandas 2.2.2) have no wheels for Python 3.13+.
+fastapi
+uvicorn[standard]
+python-multipart
+pydantic
+pandas
+numpy
+nltk
+joblib
+contractions
+# must match the version the pickled TF-IDF models were trained with
+scikit-learn==1.9.0

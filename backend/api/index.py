@@ -68,7 +68,7 @@ from exceptions import (
     request_validation_error_handler,
     unhandled_exception_handler,
 )
-from routes import predict, batch, stats
+from routes import predict, batch, stats, models
 
 # Create the FastAPI app (without lifespan)
 app = FastAPI(
@@ -96,6 +96,7 @@ app.add_middleware(
 app.include_router(predict.router, tags=["sentiment"])
 app.include_router(batch.router, tags=["batch"])
 app.include_router(stats.router, tags=["stats"])
+app.include_router(models.router, tags=["models"])
 
 
 # Dependency injection for routes - override the app.state access

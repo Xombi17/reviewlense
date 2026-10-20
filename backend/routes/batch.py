@@ -2,19 +2,33 @@
 
 import io
 
+import os
+
 import pandas as pd
 from fastapi import APIRouter, File, Request, UploadFile
+from fastapi.concurrency import run_in_threadpool
 
-from exceptions import FileTooLargeError, MissingColumnError, ValidationError
-from ml.preprocessing import clean_review_text
+from exceptions import FileTooLargeError, MissingColumnError, ModelNotFoundError, ValidationError
 from schemas.batch import BatchResponse
 
 router = APIRouter()
 
 MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024
 MAX_ROWS = 2000
-BATCH_MODEL = "lr"
+DEFAULT_BATCH_MODEL = "lr"
 TOP_N = 3
+
+
+def _transformer_max_rows() -> int:
+    """Row cap when scoring with the transformer, which is far slower per review than TF-IDF."""
+    return int(os.getenv("TRANSFORMER_MAX_BATCH_ROWS", "500"))
+
+
+def _get_loader(request: Request):
+    if hasattr(request.app.state, "loader") and request.app.state.loader is not None:
+        return request.app.state.loader
+    from api.index import get_loader
+    return get_loader()
 
 
 def _get_predictor(request: Request):
@@ -34,9 +48,13 @@ def _get_trust_analyzer(request: Request):
 
 @router.post("/batch", response_model=BatchResponse)
 async def batch_predict(
-    request: Request, file: UploadFile = File(...)
+    request: Request, file: UploadFile = File(...), model: str = DEFAULT_BATCH_MODEL
 ) -> BatchResponse:
     """Process a batch of reviews uploaded as a CSV file."""
+    available_models = _get_loader(request).available_models()
+    if model not in available_models:
+        raise ModelNotFoundError(f"Model '{model}' is not loaded. Available: {available_models}")
+
     contents = await file.read()
     if len(contents) > MAX_FILE_SIZE_BYTES:
         raise FileTooLargeError(
@@ -57,6 +75,12 @@ async def batch_predict(
     if total_rows > MAX_ROWS:
         raise ValidationError(f"CSV has {total_rows} rows; maximum allowed is {MAX_ROWS}.")
 
+    if model == "transformer" and total_rows > _transformer_max_rows():
+        raise ValidationError(
+            f"CSV has {total_rows} rows; the transformer model accepts at most "
+            f"{_transformer_max_rows()} per upload. Use model=lr for larger files."
+        )
+
     predictor = _get_predictor(request)
     trust_analyzer = _get_trust_analyzer(request)
 
@@ -68,25 +92,16 @@ async def batch_predict(
     processed = 0
     skipped = 0
 
-    for _, row in dataframe.iterrows():
-        raw_review = row["reviewText"]
+    valid_reviews: list[str] = []
+    for raw_review in dataframe["reviewText"]:
         if not isinstance(raw_review, str) or not raw_review.strip():
             skipped += 1
             continue
+        valid_reviews.append(raw_review)
 
-        cleaned_review = clean_review_text(raw_review)
-        if cleaned_review:
-            sentiment_result = predictor.predict_sentiment(
-                cleaned_review, model_name=BATCH_MODEL
-            )
-        else:
-            sentiment_result = {
-                "sentiment": 0,
-                "confidence": 0.5,
-                "reliability": "LOW",
-                "flags": ["uncertain_prediction", "empty_text"],
-            }
+    sentiment_results = await run_in_threadpool(predictor.predict_reviews, valid_reviews, model)
 
+    for raw_review, sentiment_result in zip(valid_reviews, sentiment_results):
         trust_result = trust_analyzer.calculate_trust_score(raw_review)
         confidence = float(sentiment_result["confidence"])
         trust_score = float(trust_result["score"])
@@ -140,4 +155,5 @@ async def batch_predict(
         top_praised=top_praised,
         suspicious_count=suspicious_count,
         reliability_breakdown=reliability_breakdown,
+        model_used=model,
     )

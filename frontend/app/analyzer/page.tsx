@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { analyzeReview } from '../../lib/api';
-import type { PredictResponse } from '../../lib/types';
+import { analyzeReview, fetchModels, FALLBACK_MODELS } from '../../lib/api';
+import type { ModelId, ModelInfo, PredictResponse } from '../../lib/types';
 
 import SentimentBadge from '../../components/SentimentBadge';
 import ConfidenceBar from '../../components/ConfidenceBar';
@@ -15,20 +15,39 @@ import ExampleChips from '../../components/ExampleChips';
 
 export default function AnalyzerPage() {
   const [review, setReview] = useState("");
-  const [selectedModel, setSelectedModel] = useState<"lr" | "nb">("lr");
+  const [selectedModel, setSelectedModel] = useState<ModelId>("lr");
+  const [models, setModels] = useState<ModelInfo[]>(FALLBACK_MODELS);
   const [isLoading, setIsLoading] = useState(false);
   const [prediction, setPrediction] = useState<PredictResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showResults, setShowResults] = useState(false);
   const [activeStep, setActiveStep] = useState<number>(-1);
 
-  // Neural route steps
-  const steps = [
-    { label: "CLEAN", desc: "HTML & URL Scrubbing" },
-    { label: "TOKEN", desc: "Lemmatization & Negations" },
-    { label: "VECTOR", desc: "TF-IDF Matrix Mapping" },
-    { label: "INFERENCE", desc: "Calibrated Estimation" }
-  ];
+  // Ask the backend which models it offers (the transformer is optional).
+  useEffect(() => {
+    let active = true;
+    fetchModels().then((available) => {
+      if (active) setModels(available);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Pipeline steps shown while loading; they describe what the selected model really does.
+  const steps = selectedModel === "transformer"
+    ? [
+        { label: "READ", desc: "Raw Text, No Cleaning" },
+        { label: "TOKEN", desc: "Subword Tokenization" },
+        { label: "ENCODE", desc: "Transformer Encoder" },
+        { label: "INFERENCE", desc: "Temperature-Calibrated Estimate" }
+      ]
+    : [
+        { label: "CLEAN", desc: "HTML & URL Scrubbing" },
+        { label: "TOKEN", desc: "Lemmatization & Negations" },
+        { label: "VECTOR", desc: "TF-IDF Matrix Mapping" },
+        { label: "INFERENCE", desc: "Probability Estimate" }
+      ];
 
   // Animate steps during loading
   useEffect(() => {
@@ -94,10 +113,11 @@ export default function AnalyzerPage() {
             <div className="flex flex-col gap-2">
               <span className="font-mono text-[10px] text-muted-text uppercase tracking-widest">Select Model</span>
               <div className="flex gap-2 w-full">
-                {(["lr", "nb"] as const).map((m) => (
+                {models.map(({ id: m, name }) => (
                   <button
                     key={m}
                     type="button"
+                    title={name}
                     onClick={() => setSelectedModel(m)}
                     disabled={isLoading}
                     className={`flex-1 py-2 font-mono text-[11px] font-bold uppercase tracking-wider rounded-[3px] border transition-all duration-200 cursor-pointer ${
@@ -106,7 +126,7 @@ export default function AnalyzerPage() {
                         : "border-terminal-border bg-terminal-border text-muted-text hover:text-white"
                     }`}
                   >
-                    {m === "lr" ? "LR" : "NB"}
+                    {m === "lr" ? "LR" : m === "nb" ? "NB" : "Transformer"}
                   </button>
                 ))}
               </div>

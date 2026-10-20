@@ -1,0 +1,8 @@
+# Optional: serve the fine-tuned transformer (set TRANSFORMER_MODEL to enable it).
+# The TF-IDF models do not need any of this.
+#
+# For a smaller CPU-only image install torch first from the CPU index:
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+torch>=2.2
+transformers>=4.40
+huggingface_hub>=0.23  # only used when TRANSFORMER_MODEL is a hub id

@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 
+from cors import cors_settings
 from exceptions import (
     APIError,
     api_error_handler,
@@ -16,7 +17,7 @@ from ml.aspects import AspectExtractor
 from ml.loader import ModelLoader
 from ml.predictor import Predictor
 from ml.trust import TrustAnalyzer
-from routes import predict, batch, stats
+from routes import predict, batch, stats, models
 
 
 @asynccontextmanager
@@ -61,10 +62,9 @@ app.add_exception_handler(RequestValidationError, request_validation_error_handl
 app.add_exception_handler(Exception, unhandled_exception_handler)
 
 # Enable CORS for Next.js frontend
-allow_origins = os.getenv("ALLOW_ORIGINS", "http://localhost:3000").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allow_origins,
+    **cors_settings(os.getenv("ALLOW_ORIGINS")),
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -74,6 +74,7 @@ app.add_middleware(
 app.include_router(predict.router, tags=["sentiment"])
 app.include_router(batch.router, tags=["batch"])
 app.include_router(stats.router, tags=["stats"])
+app.include_router(models.router, tags=["models"])
 
 @app.get("/")
 async def root():

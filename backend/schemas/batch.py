@@ -17,3 +17,4 @@ class BatchResponse(BaseModel):
     top_praised: List[BatchReviewItem]
     suspicious_count: int
     reliability_breakdown: Dict[str, int]
+    model_used: str = "lr"

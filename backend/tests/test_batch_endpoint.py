@@ -38,3 +38,25 @@ async def test_batch_endpoint_missing_column_error(api_client):
         "code": "MISSING_COLUMN",
         "message": "Required column 'reviewText' is missing from the uploaded CSV.",
     }
+
+
+@pytest.mark.anyio
+async def test_batch_defaults_to_lr_and_reports_the_model(api_client):
+    csv_bytes = b"reviewText\nGreat battery life and clear sound.\n"
+
+    response = await api_client.post("/batch", files={"file": ("r.csv", csv_bytes, "text/csv")})
+
+    assert response.status_code == 200
+    assert response.json()["model_used"] == "lr"
+
+
+@pytest.mark.anyio
+async def test_batch_rejects_an_unknown_model(api_client):
+    csv_bytes = b"reviewText\nGreat battery life and clear sound.\n"
+
+    response = await api_client.post(
+        "/batch", params={"model": "gpt"}, files={"file": ("r.csv", csv_bytes, "text/csv")}
+    )
+
+    assert response.status_code == 400
+    assert response.json()["code"] == "MODEL_NOT_FOUND"
