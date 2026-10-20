@@ -8,22 +8,20 @@ Splits: train 159,980 / val 19,998 / test 19,998 (seed 42, fingerprint `5e9d4ef3
 
 | Model | Accuracy | F1 | AUC | NLL | Brier | ECE (raw) | ECE (scaled) | T |
 | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- |
-| tfidf-lr | 0.9243 [0.9208, 0.9280] | 0.9239 | 0.9766 [0.9750, 0.9784] | 0.2052 | 0.0586 | 0.0354 [0.0324, 0.0389] | 0.0050 | 0.74 |
-| tfidf-nb | 0.8920 [0.8879, 0.8960] | 0.8912 | 0.9585 [0.9561, 0.9608] | 0.2752 | 0.0812 | 0.0447 [0.0421, 0.0491] | 0.0096 | 0.72 |
+| tfidf-lr | 0.9253 [0.9217, 0.9289] | 0.9251 | 0.9769 [0.9752, 0.9787] | 0.1976 | 0.0570 | 0.0217 [0.0189, 0.0249] | 0.0057 | 0.83 |
+| tfidf-nb | 0.8921 [0.8881, 0.8962] | 0.8912 | 0.9585 [0.9562, 0.9610] | 0.2726 | 0.0805 | 0.0405 [0.0375, 0.0446] | 0.0100 | 0.75 |
 | transformer-distilroberta-base | 0.9611 [0.9584, 0.9637] | 0.9610 | 0.9915 [0.9905, 0.9925] | 0.1374 | 0.0327 | 0.0252 [0.0231, 0.0278] | 0.0119 | 1.48 |
 
 ECE is the expected calibration error over 10 equal-width confidence bins (lower is better). T is the temperature fitted on validation; T > 1 means the raw model was overconfident.
 
-> **tfidf-lr** picked 2.0 at the edge of its search grid (2.0 to 128.0), so a better value may lie outside it and this baseline may be slightly under-tuned.
-
-> **tfidf-nb** picked 0.1 at the edge of its search grid (0.1 to 3.0), so a better value may lie outside it and this baseline may be slightly under-tuned.
+> **tfidf-nb** picked 0.01 at the edge of its search grid (0.01 to 1.0), so a better value may lie outside it and this baseline may be slightly under-tuned.
 
 ## Cost
 
 | Model | Parameters | Train (s) | Test inference (s) | ms / review | Hardware |
 | :-- | :-- | :-- | :-- | :-- | :-- |
-| tfidf-lr | n/a | 50 | 2.5 | 0.13 | x86_64, 2 CPU threads, GPU Tesla T4 |
-| tfidf-nb | n/a | 37 | 2.5 | 0.13 | x86_64, 2 CPU threads, GPU Tesla T4 |
+| tfidf-lr | n/a | 42 | 2.4 | 0.12 | x86_64, 2 CPU threads, CPU only |
+| tfidf-nb | n/a | 36 | 2.4 | 0.12 | x86_64, 2 CPU threads, CPU only |
 | transformer-distilroberta-base | 82,119,938 | 1936 | 66.0 | 3.30 | x86_64, 2 CPU threads, GPU Tesla T4 |
 
 Timings are wall-clock on the hardware shown, so they are only comparable between rows run on the same machine.
@@ -32,8 +30,8 @@ Timings are wall-clock on the hardware shown, so they are only comparable betwee
 
 | Model | acc @ 100% | acc @ 90% | acc @ 80% | acc @ 70% | acc @ 50% | AURC |
 | :-- | :-- | :-- | :-- | :-- | :-- | :-- |
-| tfidf-lr | 92.43% | 95.72% | 97.60% | 98.46% | 99.23% | 0.0150 |
-| tfidf-nb | 89.20% | 92.90% | 95.16% | 96.67% | 98.34% | 0.0283 |
+| tfidf-lr | 92.53% | 95.79% | 97.56% | 98.52% | 99.25% | 0.0149 |
+| tfidf-nb | 89.21% | 92.88% | 95.17% | 96.69% | 98.31% | 0.0284 |
 | transformer-distilroberta-base | 96.11% | 98.56% | 99.19% | 99.46% | 99.52% | 0.0062 |
 
 Temperature scaling is monotonic, so it cannot change which predictions rank as most confident; this table is identical before and after calibration. AURC is the area under the risk-coverage curve (lower is better).
@@ -46,10 +44,10 @@ The API labels predictions HIGH (confidence >= 0.90), MEDIUM (>= 0.70) and LOW. 
 
 | Model | Calibration | HIGH share / acc | MEDIUM share / acc | LOW share / acc |
 | :-- | :-- | :-- | :-- | :-- |
-| tfidf-lr | raw | 63.7% / 98.8% | 24.2% / 89.2% | 12.1% / 65.1% |
-| tfidf-lr | scaled | 74.8% / 98.1% | 16.3% / 82.9% | 8.9% / 61.8% |
-| tfidf-nb | raw | 49.1% / 98.4% | 32.4% / 89.6% | 18.5% / 64.1% |
-| tfidf-nb | scaled | 64.2% / 97.3% | 22.7% / 83.5% | 13.1% / 59.5% |
+| tfidf-lr | raw | 68.9% / 98.6% | 20.6% / 86.9% | 10.5% / 63.9% |
+| tfidf-lr | scaled | 75.1% / 98.1% | 16.1% / 83.2% | 8.8% / 61.9% |
+| tfidf-nb | raw | 51.1% / 98.3% | 31.1% / 89.1% | 17.8% / 63.3% |
+| tfidf-nb | scaled | 64.1% / 97.3% | 22.7% / 83.3% | 13.1% / 59.8% |
 | transformer-distilroberta-base | raw | 96.5% / 97.4% | 2.3% / 65.4% | 1.2% / 50.6% |
 | transformer-distilroberta-base | scaled | 94.1% / 98.0% | 4.1% / 71.4% | 1.8% / 53.1% |
 
@@ -61,9 +59,9 @@ Accuracy(A) - Accuracy(B) with a paired bootstrap interval, and an exact McNemar
 
 | A | B | Delta accuracy | only A right | only B right | McNemar p |
 | :-- | :-- | :-- | :-- | :-- | :-- |
-| tfidf-lr | tfidf-nb | 0.0324 [0.0287, 0.0359] | 1138 | 491 | 3.229e-59 |
-| tfidf-lr | transformer-distilroberta-base | -0.0368 [-0.0402, -0.0332] | 287 | 1023 | 4.269e-97 |
-| tfidf-nb | transformer-distilroberta-base | -0.0692 [-0.0733, -0.0647] | 313 | 1696 | 3.056e-229 |
+| tfidf-lr | tfidf-nb | 0.0332 [0.0294, 0.0369] | 1157 | 493 | 1.484e-61 |
+| tfidf-lr | transformer-distilroberta-base | -0.0358 [-0.0393, -0.0324] | 296 | 1012 | 7.986e-92 |
+| tfidf-nb | transformer-distilroberta-base | -0.0690 [-0.0731, -0.0646] | 313 | 1693 | 1.471e-228 |
 
 ## Setup
 
@@ -72,28 +70,32 @@ Accuracy(A) - Accuracy(B) with a paired bootstrap interval, and an exact McNemar
   "tfidf-lr": {
     "preprocess": "raw",
     "max_features": 100000,
-    "C": 2.0,
+    "C": 4.0,
     "grid": [
+      0.25,
+      0.5,
+      1.0,
       2.0,
+      4.0,
       8.0,
-      32.0,
-      128.0
+      32.0
     ],
-    "at_grid_edge": true,
-    "val_accuracy_at_selection": 0.9252425242524253
+    "at_grid_edge": false,
+    "val_accuracy_at_selection": 0.9256925692569257
   },
   "tfidf-nb": {
     "preprocess": "raw",
     "max_features": 100000,
-    "alpha": 0.1,
+    "alpha": 0.01,
     "grid": [
+      0.01,
+      0.03,
       0.1,
       0.3,
-      1.0,
-      3.0
+      1.0
     ],
     "at_grid_edge": true,
-    "val_accuracy_at_selection": 0.8938393839383938
+    "val_accuracy_at_selection": 0.8943394339433943
   },
   "transformer-distilroberta-base": {
     "model_name": "distilroberta-base",

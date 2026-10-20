@@ -4,20 +4,23 @@
       "config": {
         "preprocess": "raw",
         "max_features": 100000,
-        "C": 2.0,
+        "C": 4.0,
         "grid": [
+          0.25,
+          0.5,
+          1.0,
           2.0,
+          4.0,
           8.0,
-          32.0,
-          128.0
+          32.0
         ],
-        "at_grid_edge": true,
-        "val_accuracy_at_selection": 0.9252425242524253
+        "at_grid_edge": false,
+        "val_accuracy_at_selection": 0.9256925692569257
       },
-      "train_seconds": 50.37230610847473,
-      "inference_seconds": 2.502673625946045,
+      "train_seconds": 42.302337408065796,
+      "inference_seconds": 2.400022029876709,
       "n_parameters": null,
-      "hardware": "x86_64, 2 CPU threads, GPU Tesla T4",
+      "hardware": "x86_64, 2 CPU threads, CPU only",
       "versions": {
         "python": "3.13.15",
         "scikit-learn": "1.6.1",
@@ -30,20 +33,21 @@
       "config": {
         "preprocess": "raw",
         "max_features": 100000,
-        "alpha": 0.1,
+        "alpha": 0.01,
         "grid": [
+          0.01,
+          0.03,
           0.1,
           0.3,
-          1.0,
-          3.0
+          1.0
         ],
         "at_grid_edge": true,
-        "val_accuracy_at_selection": 0.8938393839383938
+        "val_accuracy_at_selection": 0.8943394339433943
       },
-      "train_seconds": 37.43245482444763,
-      "inference_seconds": 2.504120111465454,
+      "train_seconds": 35.54940581321716,
+      "inference_seconds": 2.4016106128692627,
       "n_parameters": null,
-      "hardware": "x86_64, 2 CPU threads, GPU Tesla T4",
+      "hardware": "x86_64, 2 CPU threads, CPU only",
       "versions": {
         "python": "3.13.15",
         "scikit-learn": "1.6.1",
