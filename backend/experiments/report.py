@@ -147,6 +147,29 @@ def seed_groups(meta: dict) -> List[dict]:
     return list(groups.values())
 
 
+def _repeat_sentence(analysis: dict, repeat: str, original: str) -> str:
+    delta = abs(
+        analysis["models"][repeat]["uncalibrated"]["accuracy"]
+        - analysis["models"][original]["uncalibrated"]["accuracy"]
+    )
+    pair = next(
+        (
+            comparison for comparison in analysis["comparisons"]
+            if {comparison["a"], comparison["b"]} == {repeat, original}
+        ),
+        None,
+    )
+    flipped = (
+        f"; {pair['mcnemar']['only_a_correct'] + pair['mcnemar']['only_b_correct']} test reviews were "
+        f"classified correctly by only one of the two runs (McNemar p = {pair['mcnemar']['p_value']:.3g})"
+        if pair else ""
+    )
+    return (
+        f"`{repeat}` re-ran the configuration of `{original}` with the same seed: accuracy differs by "
+        f"{delta:.4f}{flipped}. This is run-to-run nondeterminism, not seed variance."
+    )
+
+
 def _mean_sd(values) -> str:
     values = np.asarray(values, dtype=float)
     spread = values.std(ddof=1) if len(values) > 1 else float("nan")
@@ -331,14 +354,21 @@ def render_markdown(meta: dict, analysis: dict) -> str:
                 )
                 add("")
             for repeat, original in group["repeats"]:
-                delta = abs(
-                    analysis["models"][repeat]["uncalibrated"]["accuracy"]
-                    - analysis["models"][original]["uncalibrated"]["accuracy"]
-                )
-                add(
-                    f"`{repeat}` re-ran the configuration of `{original}` with the same seed; "
-                    f"accuracy differs by {delta:.4f}, which is run-to-run nondeterminism, not seed variance."
-                )
+                add(_repeat_sentence(analysis, repeat, original))
+                add("")
+
+    repeat_only = [group for group in seed_groups(meta) if group["repeats"] and len(group["seeds"]) < 2]
+    if repeat_only:
+        add("## Reproducibility")
+        add("")
+        add(
+            "A configuration was trained twice with the same seed. GPU kernels are not bitwise "
+            "deterministic, so the two runs are not identical."
+        )
+        add("")
+        for group in repeat_only:
+            for repeat, original in group["repeats"]:
+                add(_repeat_sentence(analysis, repeat, original))
                 add("")
 
     add("## Setup")

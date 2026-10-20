@@ -123,3 +123,28 @@ def test_footer_matches_whether_seed_variance_is_reported():
     without = render_markdown(single, analyse(single, solo, n_boot=20))
     assert "no variance across seeds is reported" in without
     assert "Seed variance is measured" not in without
+
+
+def test_same_seed_rerun_is_reported_even_without_multiple_seeds():
+    meta = _meta({"m": 42, "m+again": 42})
+    rng = np.random.default_rng(0)
+    y = (rng.random(400) < 0.5).astype(int)
+    arrays = {"y_val": y, "y_test": y}
+    base = (2 * y - 1) * rng.normal(1.0, 1.5, 400)
+    for name, jitter in (("m", 0.0), ("m+again", 0.05)):
+        for split in ("val", "test"):
+            arrays[f"{name}__{split}"] = base + jitter * rng.normal(size=400)
+
+    markdown = render_markdown(meta, analyse(meta, arrays, n_boot=20))
+
+    assert "## Reproducibility" in markdown
+    assert "## Seed variance" not in markdown  # only one distinct seed
+    assert "`m+again` re-ran the configuration of `m` with the same seed" in markdown
+    assert "classified correctly by only one of the two runs" in markdown
+    # both rows stay in the pairwise table: with no seed group nothing is collapsed
+    assert "| m | m+again |" in markdown
+
+
+def test_no_reproducibility_section_without_a_rerun():
+    meta, arrays = _synthetic_run()
+    assert "## Reproducibility" not in render_markdown(meta, analyse(meta, arrays, n_boot=20))

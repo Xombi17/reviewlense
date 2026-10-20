@@ -71,6 +71,12 @@ Accuracy(A) - Accuracy(B) with a paired bootstrap interval, and an exact McNemar
 | tfidf-nb | transformer-distilroberta-base+saved | -0.0698 [-0.0737, -0.0655] | 301 | 1696 | 2.119e-235 |
 | transformer-distilroberta-base | transformer-distilroberta-base+saved | -0.0008 [-0.0017, 0.0002] | 43 | 58 | 0.1633 |
 
+## Reproducibility
+
+A configuration was trained twice with the same seed. GPU kernels are not bitwise deterministic, so the two runs are not identical.
+
+`transformer-distilroberta-base+saved` re-ran the configuration of `transformer-distilroberta-base` with the same seed: accuracy differs by 0.0008; 101 test reviews were classified correctly by only one of the two runs (McNemar p = 0.163). This is run-to-run nondeterminism, not seed variance.
+
 ## Setup
 
 ```json

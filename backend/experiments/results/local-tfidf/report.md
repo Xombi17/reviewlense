@@ -80,36 +80,20 @@ The API labels predictions HIGH (confidence >= 0.90), MEDIUM (>= 0.70) and LOW. 
 
 Accuracy(A) - Accuracy(B) with a paired bootstrap interval, and an exact McNemar test on the reviews where exactly one model is right.
 
+Rows from additional training seeds are left out to keep the table readable (they are in `results.json`); see Seed variance for how much seeds differ.
+
 | A | B | Delta accuracy | only A right | only B right | McNemar p |
 | :-- | :-- | :-- | :-- | :-- | :-- |
 | tfidf-lr | tfidf-nb | 0.0020 [-0.0105, 0.0140] | 71 | 67 | 0.7985 |
 | tfidf-lr | tfidf-lr+clean | 0.0125 [0.0000, 0.0250] | 87 | 62 | 0.04892 |
 | tfidf-lr | tfidf-nb+clean | 0.0215 [0.0060, 0.0365] | 137 | 94 | 0.005604 |
 | tfidf-lr | transformer-distilroberta-base | -0.0510 [-0.0655, -0.0385] | 43 | 145 | 3.986e-14 |
-| tfidf-lr | transformer-distilroberta-base+s1 | -0.0500 [-0.0640, -0.0370] | 48 | 148 | 4.675e-13 |
-| tfidf-lr | transformer-distilroberta-base+s2 | -0.0520 [-0.0665, -0.0390] | 42 | 146 | 1.16e-14 |
-| tfidf-lr | transformer-distilroberta-base+s3 | -0.0480 [-0.0620, -0.0335] | 59 | 155 | 3.937e-11 |
 | tfidf-nb | tfidf-lr+clean | 0.0105 [-0.0025, 0.0230] | 93 | 72 | 0.1192 |
 | tfidf-nb | tfidf-nb+clean | 0.0195 [0.0075, 0.0310] | 96 | 57 | 0.002025 |
 | tfidf-nb | transformer-distilroberta-base | -0.0530 [-0.0665, -0.0395] | 50 | 156 | 6.994e-14 |
-| tfidf-nb | transformer-distilroberta-base+s1 | -0.0520 [-0.0665, -0.0375] | 55 | 159 | 6.634e-13 |
-| tfidf-nb | transformer-distilroberta-base+s2 | -0.0540 [-0.0680, -0.0400] | 48 | 156 | 1.594e-14 |
-| tfidf-nb | transformer-distilroberta-base+s3 | -0.0500 [-0.0645, -0.0350] | 66 | 166 | 4.031e-11 |
 | tfidf-lr+clean | tfidf-nb+clean | 0.0090 [-0.0045, 0.0220] | 104 | 86 | 0.2174 |
 | tfidf-lr+clean | transformer-distilroberta-base | -0.0635 [-0.0775, -0.0490] | 46 | 173 | 1.643e-18 |
-| tfidf-lr+clean | transformer-distilroberta-base+s1 | -0.0625 [-0.0770, -0.0465] | 53 | 178 | 5.513e-17 |
-| tfidf-lr+clean | transformer-distilroberta-base+s2 | -0.0645 [-0.0785, -0.0500] | 46 | 175 | 6.533e-19 |
-| tfidf-lr+clean | transformer-distilroberta-base+s3 | -0.0605 [-0.0745, -0.0455] | 58 | 179 | 1.51e-15 |
 | tfidf-nb+clean | transformer-distilroberta-base | -0.0725 [-0.0885, -0.0570] | 56 | 201 | 2.33e-20 |
-| tfidf-nb+clean | transformer-distilroberta-base+s1 | -0.0715 [-0.0875, -0.0550] | 62 | 205 | 4.809e-19 |
-| tfidf-nb+clean | transformer-distilroberta-base+s2 | -0.0735 [-0.0895, -0.0575] | 56 | 203 | 9.456e-21 |
-| tfidf-nb+clean | transformer-distilroberta-base+s3 | -0.0695 [-0.0845, -0.0530] | 68 | 207 | 1.712e-17 |
-| transformer-distilroberta-base | transformer-distilroberta-base+s1 | 0.0010 [-0.0055, 0.0080] | 25 | 23 | 0.8854 |
-| transformer-distilroberta-base | transformer-distilroberta-base+s2 | -0.0010 [-0.0075, 0.0050] | 18 | 20 | 0.8714 |
-| transformer-distilroberta-base | transformer-distilroberta-base+s3 | 0.0030 [-0.0055, 0.0115] | 35 | 29 | 0.5323 |
-| transformer-distilroberta-base+s1 | transformer-distilroberta-base+s2 | -0.0020 [-0.0080, 0.0045] | 20 | 24 | 0.6516 |
-| transformer-distilroberta-base+s1 | transformer-distilroberta-base+s3 | 0.0020 [-0.0060, 0.0110] | 36 | 32 | 0.7163 |
-| transformer-distilroberta-base+s2 | transformer-distilroberta-base+s3 | 0.0040 [-0.0035, 0.0115] | 33 | 25 | 0.3581 |
 
 ## Seed variance
 
@@ -123,6 +107,8 @@ Same splits and hyperparameters, different training seed (classifier-head initia
 | AUC | 0.9811 ± 0.0004 (min 0.9809, max 0.9816) |
 | ECE (raw) | 0.0361 ± 0.0049 (min 0.0290, max 0.0403) |
 | Fitted temperature T | 1.4284 ± 0.1022 (min 1.2798, max 1.5067) |
+
+Across the 6 pairs of seeds, the largest accuracy difference is 0.0040 and the smallest McNemar p-value is 0.358.
 
 ## Setup
 
@@ -296,4 +282,4 @@ Versions per model:
 }
 ```
 
-One training seed per model; no variance across seeds is reported.
+Seed variance is measured for the fine-tuned rows above. TF-IDF rows are deterministic given the data, so they have one run each.
