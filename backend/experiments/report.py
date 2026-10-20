@@ -71,25 +71,36 @@ def analyse(meta: dict, arrays: Dict[str, np.ndarray], n_boot: int = 1000) -> di
     return analysis
 
 
-def _plot_reliability(meta: dict, analysis: dict, path: str) -> None:
+def _plot_reliability(meta: dict, analysis: dict, arrays: Dict[str, np.ndarray], path: str) -> None:
     models = list(meta["models"])
     figure, axes = plt.subplots(1, len(models), figsize=(4.2 * len(models), 4), squeeze=False)
     for axis, name in zip(axes[0], models):
         entry = analysis["models"][name]
-        for key, label, style in (
-            ("reliability_uncalibrated", "raw", "o--"),
-            ("reliability_calibrated", "temperature scaled", "s-"),
+        lowest_accuracy = 0.5
+        for key, label, style, color in (
+            ("reliability_uncalibrated", "raw", "--", PALETTE[0]),
+            ("reliability_calibrated", "temperature scaled", "-", PALETTE[1]),
         ):
             bins = [b for b in entry[key] if b["count"]]
-            axis.plot(
-                [b["confidence"] for b in bins], [b["accuracy"] for b in bins], style, label=label
+            confidences = [b["confidence"] for b in bins]
+            accuracies = [b["accuracy"] for b in bins]
+            lowest_accuracy = min([lowest_accuracy] + accuracies)
+            axis.plot(confidences, accuracies, style, color=color, label=label)
+            # marker area is proportional to the bin's review count, so thin bins look thin
+            axis.scatter(
+                confidences,
+                accuracies,
+                s=[10 + 300 * b["count"] / len(arrays["y_test"]) for b in bins],
+                color=color,
+                zorder=3,
             )
         axis.plot([0.5, 1], [0.5, 1], color="#6b7280", linewidth=1, label="perfect calibration")
         axis.set_title(name)
-        axis.set_xlabel("confidence")
+        axis.set_xlabel("confidence (marker size = reviews in bin)")
         axis.set_ylabel("accuracy")
         axis.set_xlim(0.5, 1.0)
-        axis.set_ylim(0.5, 1.0)
+        # never clip bins whose accuracy falls below 0.5
+        axis.set_ylim(max(0.0, np.floor((lowest_accuracy - 0.05) * 10) / 10), 1.0)
         axis.grid(alpha=0.25)
     axes[0][0].legend(fontsize=8, loc="upper left")
     figure.tight_layout()
@@ -254,7 +265,7 @@ def build_report(run_dir: str, n_boot: int = 1000) -> str:
         entry["selective"].pop("curve")
     with open(os.path.join(run_dir, "results.json"), "w", encoding="utf-8") as handle:
         json.dump(compact, handle, indent=2)
-    _plot_reliability(meta, analysis, os.path.join(run_dir, "reliability.png"))
+    _plot_reliability(meta, analysis, arrays, os.path.join(run_dir, "reliability.png"))
     _plot_risk_coverage(meta, analysis, os.path.join(run_dir, "risk_coverage.png"))
 
     markdown = render_markdown(meta, analysis)
