@@ -11,4 +11,4 @@ async def test_stats_endpoint_happy_path(api_client):
     assert "models" in payload
     assert "reliability_summary" in payload
     assert "failure_modes" in payload
-    assert set(payload["models"].keys()) == {"lr", "nb", "svm"}
+    assert set(payload["models"].keys()) == {"lr", "nb"}

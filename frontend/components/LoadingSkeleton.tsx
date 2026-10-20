@@ -20,7 +20,7 @@ export default function LoadingSkeleton() {
           <span className="text-accent-green font-bold">SUCCESS</span>
         </div>
         <div className="flex justify-between border-b border-terminal-border/20 pb-1">
-          <span>CALIBRATED_MARGIN_svm</span>
+          <span>CLASS_PROBABILITIES_lr</span>
           <span className="text-accent-amber font-bold">INFERRING...</span>
         </div>
       </div>

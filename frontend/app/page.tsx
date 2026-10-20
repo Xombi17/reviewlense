@@ -17,15 +17,15 @@ export default async function LandingPage() {
 
   const totalReviews = statsData?.total_reviews 
     ? statsData.total_reviews.toLocaleString() 
-    : "19,418";
+    : "—";
   
-  const svmAccuracy = statsData?.models?.svm?.accuracy 
-    ? `${(statsData.models.svm.accuracy * 100).toFixed(2)}%` 
-    : "94.95%";
+  const lrAccuracy = statsData?.models?.lr?.accuracy 
+    ? `${(statsData.models.lr.accuracy * 100).toFixed(2)}%` 
+    : "—";
 
   const avgConfidence = statsData?.avg_confidence 
     ? `${Math.round(statsData.avg_confidence * 100)}%` 
-    : "92%";
+    : "—";
 
   const datasetSource = statsData?.dataset_summary?.source 
     ? statsData.dataset_summary.source.split(" ")[2] || "AMAZON"
@@ -33,7 +33,7 @@ export default async function LandingPage() {
 
   const stats = [
     { label: "TOTAL DATABASE DATASETS", value: totalReviews },
-    { label: "SVM CLASSIFIER ACCURACY", value: svmAccuracy },
+    { label: "LOGISTIC REGRESSION ACCURACY", value: lrAccuracy },
     { label: "AVG INFERENCE CONFIDENCE", value: avgConfidence },
     { label: "DATABASE SOURCE", value: datasetSource },
   ];
@@ -41,8 +41,8 @@ export default async function LandingPage() {
   const features = [
     {
       code: "01 // MULTI_MODEL",
-      title: "Tri-Model Inference Matrix",
-      desc: "Simultaneous evaluation across Multinomial Naive Bayes, Logistic Regression, and Calibrated Linear SVM algorithms with live margin offsets.",
+      title: "Dual-Model Inference Matrix",
+      desc: "Side-by-side evaluation of Multinomial Naive Bayes and Logistic Regression classifiers with calibrated confidence scores.",
       color: "text-accent-cyan"
     },
     {

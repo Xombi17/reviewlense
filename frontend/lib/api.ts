@@ -22,7 +22,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
  */
 const ERROR_CODE_MESSAGES: Record<string, string> = {
   VALIDATION_ERROR: "Invalid review format. Please try again.",
-  EMPTY_REVIEW: "Review must be at least 10 characters.",
+  EMPTY_REVIEW: "Review text is empty. Please enter a review.",
   MODEL_NOT_FOUND: "Selected model not available. Try another.",
   FILE_TOO_LARGE: "File is too large (max 5MB). Please use a smaller file.",
   MISSING_COLUMN: "CSV must have a 'reviewText' column.",
@@ -105,13 +105,13 @@ async function retryWithBackoff<T>(
  * POST /predict
  *
  * @param review - The review text to analyze (10–5000 characters)
- * @param model  - Optional model to use: "lr" (default), "nb", or "svm"
+ * @param model  - Optional model to use: "lr" (default) or "nb"
  * @returns Promise<PredictResponse>
  * @throws Error with user-friendly message on failure
  */
 export async function analyzeReview(
   review: string,
-  model?: "lr" | "nb" | "svm"
+  model?: "lr" | "nb"
 ): Promise<PredictResponse> {
   return retryWithBackoff(async () => {
     const request: PredictRequest = {

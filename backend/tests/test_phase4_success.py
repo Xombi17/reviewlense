@@ -35,7 +35,7 @@ def test_phase4_success_criterion_3_trust_low_score(loaded_trust_analyzer):
 
 
 def test_phase4_success_criterion_4_confidence_range(loaded_predictor):
-    for model_name in ["lr", "nb", "svm"]:
+    for model_name in ["lr", "nb"]:
         result = predict("battery life is amazing", model_name)
         assert isinstance(result["confidence"], float)
         assert 0.5 <= result["confidence"] <= 1.0

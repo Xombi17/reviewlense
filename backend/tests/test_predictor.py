@@ -26,7 +26,7 @@ def test_predictor_returns_correct_shape():
 
 
 def test_predictor_confidence_range():
-    for model_name in ["lr", "nb", "svm"]:
+    for model_name in ["lr", "nb"]:
         result = predictor.predict_sentiment(
             clean_review_text("this product is wonderful and I love it"), model_name
         )
@@ -67,7 +67,7 @@ def test_predictor_module_level_function():
 
 
 def test_predictor_works_for_all_three_models():
-    for model_name in ["lr", "nb", "svm"]:
+    for model_name in ["lr", "nb"]:
         result = predictor.predict_sentiment(clean_review_text("this is great"), model_name)
         assert set(result.keys()) == {"sentiment", "confidence", "reliability", "flags"}
         assert 0.5 <= result["confidence"] <= 1.0

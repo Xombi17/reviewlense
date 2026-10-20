@@ -14,8 +14,8 @@ interface ModelTableProps {
 }
 
 export default function ModelTable({ models }: ModelTableProps) {
-  // Order exactly: Logistic Regression (lr), Naive Bayes (nb), SVM (svm)
-  const order = ["lr", "nb", "svm"];
+  // Order exactly: Logistic Regression (lr), Naive Bayes (nb)
+  const order = ["lr", "nb"];
   const orderedModels = order
     .map((key) => {
       const model = models[key];

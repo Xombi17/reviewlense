@@ -14,7 +14,7 @@ def test_loader_loads_all_models():
     loader = ModelLoader(models_dir=MODELS_DIR)
     loader.load_all_models()
 
-    assert set(loader.models.keys()) == {"lr", "nb", "svm"}
+    assert set(loader.models.keys()) == {"lr", "nb"}
     assert loader.vectorizer is not None
     assert loader.get_model("lr") is loader.models["lr"]
 

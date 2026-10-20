@@ -23,7 +23,6 @@ The Single Review Analysis section allows you to test individual review texts in
 3. Choose a machine learning classifier from the **Select Model** dropdown:
    - **Logistic Regression** (Default, well-balanced)
    - **Naive Bayes** (Fast, baseline classifier)
-   - **Linear SVM** (Highly accurate, calibrated probability outputs)
 4. Click the **Analyze** button.
 
 ---
