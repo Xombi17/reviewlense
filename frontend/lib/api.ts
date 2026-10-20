@@ -9,6 +9,9 @@ import {
   PredictResponse,
   StatsResponse,
   BatchResponse,
+  ModelId,
+  ModelInfo,
+  ModelsResponse,
 } from "./types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -105,13 +108,13 @@ async function retryWithBackoff<T>(
  * POST /predict
  *
  * @param review - The review text to analyze (10–5000 characters)
- * @param model  - Optional model to use: "lr" (default) or "nb"
+ * @param model  - Optional model to use: "lr" (default), "nb", or "transformer" when offered by GET /models
  * @returns Promise<PredictResponse>
  * @throws Error with user-friendly message on failure
  */
 export async function analyzeReview(
   review: string,
-  model?: "lr" | "nb"
+  model?: ModelId
 ): Promise<PredictResponse> {
   return retryWithBackoff(async () => {
     const request: PredictRequest = {
@@ -141,6 +144,32 @@ export async function analyzeReview(
 
     return response.json() as Promise<PredictResponse>;
   });
+}
+
+/**
+ * TF-IDF models every deployment has; used when GET /models cannot be reached.
+ */
+export const FALLBACK_MODELS: ModelInfo[] = [
+  { id: "lr", name: "Logistic Regression (TF-IDF)", is_default: true, calibrated: false },
+  { id: "nb", name: "Multinomial Naive Bayes (TF-IDF)", is_default: false, calibrated: false },
+];
+
+/**
+ * List the models this deployment can serve.
+ * GET /models
+ *
+ * Never throws: if the backend is unreachable or older than this endpoint,
+ * the always-available TF-IDF models are returned so the analyzer still works.
+ */
+export async function fetchModels(): Promise<ModelInfo[]> {
+  try {
+    const response = await fetch(`${API_BASE}/models`);
+    if (!response.ok) return FALLBACK_MODELS;
+    const body = (await response.json()) as ModelsResponse;
+    return body.models.length > 0 ? body.models : FALLBACK_MODELS;
+  } catch {
+    return FALLBACK_MODELS;
+  }
 }
 
 /**

@@ -84,6 +84,14 @@ npm run dev
 ```
 The client UI will run on [http://localhost:3000](http://localhost:3000).
 
+### Optional: the fine-tuned transformer
+A fine-tuned DistilRoBERTa beat the TF-IDF models by 3.6 points of accuracy on a 200k-review Amazon sample (see `backend/experiments/results/hf-200k/report.md`). The API serves it as a third model when it is configured:
+```bash
+pip install -r backend/requirements-transformer.txt
+TRANSFORMER_MODEL=/path/to/saved/model PYTHONPATH=. uvicorn main:app --port 8000
+```
+The model folder comes from `python -m experiments.run_experiment --save-model DIR` (see `backend/experiments/README.md`) and includes the calibration that makes its confidence meaningful. Without `TRANSFORMER_MODEL` the API serves the TF-IDF models only. Details are in `docs/api-reference.md`.
+
 ### 3. Run Test Suites
 Verify that everything is set up correctly by running tests:
 ```bash

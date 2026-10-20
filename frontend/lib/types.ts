@@ -14,11 +14,34 @@ export interface AspectSentiment {
 }
 
 /**
+ * Model ids the backend can serve. "transformer" is only present when the
+ * deployment has the fine-tuned model configured; ask GET /models.
+ */
+export type ModelId = "lr" | "nb" | "transformer";
+
+/**
+ * One entry of GET /models.
+ */
+export interface ModelInfo {
+  id: ModelId;
+  name: string;
+  is_default: boolean;
+  /** True when confidence is a temperature-scaled probability. */
+  calibrated: boolean;
+  temperature?: number | null;
+  base_model?: string | null;
+}
+
+export interface ModelsResponse {
+  models: ModelInfo[];
+}
+
+/**
  * Request body for POST /predict endpoint.
  */
 export interface PredictRequest {
   review: string;
-  model?: "lr" | "nb";
+  model?: ModelId;
 }
 
 /**
@@ -32,7 +55,7 @@ export interface PredictResponse {
   aspects: AspectSentiment[];
   trust_score: number;
   flags: string[];
-  model_used: "lr" | "nb";
+  model_used: ModelId;
 }
 
 /**
@@ -130,4 +153,5 @@ export interface BatchResponse {
   top_praised: BatchReviewItem[];
   suspicious_count: number;
   reliability_breakdown: Record<string, number>;
+  model_used?: string;
 }
