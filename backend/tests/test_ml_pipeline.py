@@ -10,6 +10,12 @@ TEST_DIR = os.path.dirname(os.path.abspath(__file__))
 BACKEND_DIR = os.path.dirname(TEST_DIR)
 PROJECT_ROOT = os.path.dirname(BACKEND_DIR)
 
+# These tests retrain on the full processed dataset, which is not checked in.
+pytestmark = pytest.mark.skipif(
+    not os.path.exists(os.path.join(BACKEND_DIR, "data", "processed_train_reviews.csv")),
+    reason="processed_train_reviews.csv not found; run ml/build_multidomain_dataset.py first",
+)
+
 def test_tfidf_vectorizer():
     """
     R1.2.1: TF-IDF Vectorizer configuration check.
@@ -34,14 +40,12 @@ def test_model_training_and_serialization():
     # Check models exist in results
     assert 'sentiment_nb' in results
     assert 'sentiment_lr' in results
-    assert 'sentiment_svm' in results
     
     # Check serialized files exist
     model_dir = os.path.join(BACKEND_DIR, "models")
     assert os.path.exists(os.path.join(model_dir, "vectorizer.pkl"))
     assert os.path.exists(os.path.join(model_dir, "sentiment_nb.pkl"))
     assert os.path.exists(os.path.join(model_dir, "sentiment_lr.pkl"))
-    assert os.path.exists(os.path.join(model_dir, "sentiment_svm.pkl"))
 
 def test_model_evaluation():
     """
@@ -51,7 +55,7 @@ def test_model_evaluation():
     
     # Check metrics exist
     assert 'metrics' in results
-    for model_name in ['nb', 'lr', 'svm']:
+    for model_name in ['nb', 'lr']:
         assert model_name in results['metrics']
         m = results['metrics'][model_name]
         assert 'accuracy' in m
@@ -62,7 +66,7 @@ def test_model_evaluation():
 
     # Check plots exist
     plot_dir = os.path.join(PROJECT_ROOT, "notebooks", "plots")
-    for model_name in ['nb', 'lr', 'svm']:
+    for model_name in ['nb', 'lr']:
         assert os.path.exists(os.path.join(plot_dir, f"confusion_matrix_{model_name}.png"))
         assert os.path.exists(os.path.join(plot_dir, f"roc_curve_{model_name}.png"))
 

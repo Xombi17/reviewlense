@@ -15,7 +15,7 @@ import ExampleChips from '../../components/ExampleChips';
 
 export default function AnalyzerPage() {
   const [review, setReview] = useState("");
-  const [selectedModel, setSelectedModel] = useState<"lr" | "nb" | "svm">("lr");
+  const [selectedModel, setSelectedModel] = useState<"lr" | "nb">("lr");
   const [isLoading, setIsLoading] = useState(false);
   const [prediction, setPrediction] = useState<PredictResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -94,7 +94,7 @@ export default function AnalyzerPage() {
             <div className="flex flex-col gap-2">
               <span className="font-mono text-[10px] text-muted-text uppercase tracking-widest">Select Model</span>
               <div className="flex gap-2 w-full">
-                {(["lr", "nb", "svm"] as const).map((m) => (
+                {(["lr", "nb"] as const).map((m) => (
                   <button
                     key={m}
                     type="button"
@@ -106,7 +106,7 @@ export default function AnalyzerPage() {
                         : "border-terminal-border bg-terminal-border text-muted-text hover:text-white"
                     }`}
                   >
-                    {m === "lr" ? "LR" : m === "nb" ? "NB" : "SVM"}
+                    {m === "lr" ? "LR" : "NB"}
                   </button>
                 ))}
               </div>

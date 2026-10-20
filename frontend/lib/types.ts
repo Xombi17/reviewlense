@@ -18,7 +18,7 @@ export interface AspectSentiment {
  */
 export interface PredictRequest {
   review: string;
-  model?: "lr" | "nb" | "svm";
+  model?: "lr" | "nb";
 }
 
 /**
@@ -32,7 +32,7 @@ export interface PredictResponse {
   aspects: AspectSentiment[];
   trust_score: number;
   flags: string[];
-  model_used: "lr" | "nb" | "svm";
+  model_used: "lr" | "nb";
 }
 
 /**

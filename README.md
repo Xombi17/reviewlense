@@ -8,7 +8,7 @@ By analyzing customer reviews, the platform extracts underlying sentiments, eval
 
 ## 🌟 Key Features
 
-* **Multi-Model Sentiment Classification**: Includes Multinomial Naive Bayes, Logistic Regression, and Calibrated Linear Support Vector Machine (SVM) models trained on real product reviews.
+* **Multi-Model Sentiment Classification**: Includes Multinomial Naive Bayes and Logistic Regression models trained on Amazon product reviews, with an optional calibrated linear SVM (`python ml/train.py --with-svm`).
 * **Uncertainty & Reliability Flagging**: Estimates prediction confidence and classifies outcomes into High, Medium, and Low reliability tiers, flagging low-confidence results.
 * **Aspect-Based Sentiment Extraction**: Extracts mentions of specific product aspects (e.g., battery, sound, comfort, build quality, connectivity, delivery, price, microphone) and determines sentiment on a sentence-by-sentence basis.
 * **Review Trust Analysis**: Evaluates the integrity of reviews using heuristic rules to apply penalties for suspicious patterns (caps shouting, word repetition, excessive exclamation marks, and short length).
@@ -43,7 +43,7 @@ graph TD
 | :--- | :--- | :--- | :--- |
 | **Backend Framework** | FastAPI | `0.111.0` | High-performance asynchronous REST API |
 | **Backend Server** | Uvicorn | `0.29.0` | ASGI server implementation |
-| **Machine Learning** | scikit-learn | `1.5.0` | ML modeling (Naive Bayes, LR, SVM) |
+| **Machine Learning** | scikit-learn | `1.9.0` | ML modeling (Naive Bayes, Logistic Regression) |
 | **Data Processing** | pandas | `2.2.2` | Data manipulation and preprocessing |
 | **Data Processing** | numpy | `1.26.4` | Numerical array operations |
 | **NLP Library** | NLTK | `3.8.1` | Tokenization, stopwords, lemmatization |
@@ -57,10 +57,10 @@ graph TD
 
 For step-by-step guides and detailed reference manuals, please refer to the following files:
 
-* **[User Guide](file:///home/varad/Documents/himshikhar/mini-project1/docs/user-guide.md)**: Details on navigating the Next.js web application, analyzing reviews, uploading batch CSVs, understanding trust penalties (length, exclamation, shouting, repetition), and review examples.
-* **[Developer Setup & ML Guide](file:///home/varad/Documents/himshikhar/mini-project1/docs/developer-guide.md)**: Comprehensive guide to setting up and running backend/frontend development servers locally, dataset characteristics, NLP cleaning steps, training pipeline execution, and model failure modes.
-* **[API Reference](file:///home/varad/Documents/himshikhar/mini-project1/docs/api-reference.md)**: Full endpoint reference for `/predict`, `/batch`, and `/stats`, detailing JSON payloads, parameter schemas, and error responses.
-* **[Demo Video Scripts](file:///home/varad/Documents/himshikhar/mini-project1/docs/demo-scripts.md)**: Timecoded, speaker-prompted, two-part video scripts for recording end-user walkthroughs and developer setup walkthroughs.
+* **[User Guide](docs/user-guide.md)**: Details on navigating the Next.js web application, analyzing reviews, uploading batch CSVs, understanding trust penalties (length, exclamation, shouting, repetition), and review examples.
+* **[Developer Setup & ML Guide](docs/developer-guide.md)**: Comprehensive guide to setting up and running backend/frontend development servers locally, dataset characteristics, NLP cleaning steps, training pipeline execution, and model failure modes.
+* **[API Reference](docs/api-reference.md)**: Full endpoint reference for `/predict`, `/batch`, and `/stats`, detailing JSON payloads, parameter schemas, and error responses.
+* **[Demo Video Scripts](docs/demo-scripts.md)**: Timecoded, speaker-prompted, two-part video scripts for recording end-user walkthroughs and developer setup walkthroughs.
 
 ---
 

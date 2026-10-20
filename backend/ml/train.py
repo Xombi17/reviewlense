@@ -1,3 +1,4 @@
+import argparse
 import os
 import joblib
 import time
@@ -26,12 +27,12 @@ PLOTS_DIR = os.path.join(os.path.dirname(BASE_DIR), "notebooks", "plots")
 STATS_PATH = os.path.join(BASE_DIR, "data", "stats.json")
 FAILURE_ANALYSIS_PATH = os.path.join(BASE_DIR, "data", "failure_analysis.json")
 
-def train_pipeline():
+def train_pipeline(include_svm: bool = False):
     """
     Executes the full ML training pipeline:
     1. Load train and test datasets
     2. Vectorize text (TF-IDF)
-    3. Train classifiers (NB, LR, Calibrated SVM)
+    3. Train classifiers (NB, LR, and optionally Calibrated SVM)
     4. Evaluate and save metrics/plots
     5. Save models and statistics
     """
@@ -94,12 +95,16 @@ def train_pipeline():
     lr_model.fit(X_train, y_train)
     print(f"      ✓ LR trained in {time.time() - start:.1f}s | Iterations: {lr_model.n_iter_[0]}")
 
-    print("\n[4/5] Training Calibrated Linear SVM (5-fold CV)...")
-    start = time.time()
-    base_svc = LinearSVC(C=1.0, random_state=42, dual=False)
-    svm_model = CalibratedClassifierCV(estimator=base_svc, method='sigmoid', cv=5)
-    svm_model.fit(X_train, y_train)
-    print(f"      ✓ SVM trained in {time.time() - start:.1f}s")
+    svm_model = None
+    if include_svm:
+        print("\n[4/5] Training Calibrated Linear SVM (5-fold CV)...")
+        start = time.time()
+        base_svc = LinearSVC(C=1.0, random_state=42, dual=False)
+        svm_model = CalibratedClassifierCV(estimator=base_svc, method='sigmoid', cv=5)
+        svm_model.fit(X_train, y_train)
+        print(f"      ✓ SVM trained in {time.time() - start:.1f}s")
+    else:
+        print("\n[4/5] Skipping Calibrated SVM (pass --with-svm to train it)")
     
     # 4. Evaluation (R1.4)
     models = {
@@ -209,6 +214,11 @@ def train_pipeline():
         "models": {
             "lr": {**metrics['lr'], "name": "Logistic Regression", "is_default": True},
             "nb": {**metrics['nb'], "name": "Multinomial Naive Bayes", "is_default": False},
+            **(
+                {"svm": {**metrics['svm'], "name": "Linear SVM (Calibrated)", "is_default": False}}
+                if svm_model is not None
+                else {}
+            ),
         },
         "reliability_summary": {
             "high_confidence_percentage": float(high_conf),
@@ -233,7 +243,8 @@ def train_pipeline():
     joblib.dump(vectorizer, os.path.join(MODELS_DIR, 'vectorizer.pkl'))
     joblib.dump(nb_model, os.path.join(MODELS_DIR, 'sentiment_nb.pkl'))
     joblib.dump(lr_model, os.path.join(MODELS_DIR, 'sentiment_lr.pkl'))
-    # SVM skipped for 1M training
+    if svm_model is not None:
+        joblib.dump(svm_model, os.path.join(MODELS_DIR, 'sentiment_svm.pkl'))
     print(f"      ✓ Models saved in {time.time() - start:.1f}s")
 
     print("\n" + "="*60)
@@ -246,12 +257,21 @@ def train_pipeline():
     print(f" 📋 Stats saved to:       {STATS_PATH}")
     print("="*60 + "\n")
 
-    return {
+    results = {
         'vectorizer': vectorizer,
         'sentiment_nb': nb_model,
         'sentiment_lr': lr_model,
         'metrics': metrics
     }
+    if svm_model is not None:
+        results['sentiment_svm'] = svm_model
+    return results
 
 if __name__ == "__main__":
-    train_pipeline()
+    parser = argparse.ArgumentParser(description="Train ReviewLens sentiment models")
+    parser.add_argument(
+        "--with-svm",
+        action="store_true",
+        help="Also train the calibrated linear SVM (slow on large datasets)",
+    )
+    train_pipeline(include_svm=parser.parse_args().with_svm)

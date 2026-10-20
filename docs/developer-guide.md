@@ -89,15 +89,15 @@ The text is preprocessed in [backend/ml/preprocessing.py](file:///home/varad/Doc
 ### Models Trained:
 1. **Logistic Regression (`lr`)** — Default classifier.
 2. **Multinomial Naive Bayes (`nb`)** — Baseline classifier.
-3. **Calibrated SVM (`svm`)** — Linear SVM (`LinearSVC`) wrapped inside `CalibratedClassifierCV` to obtain probabilistic outputs (`predict_proba`).
+
+An optional **Calibrated SVM** (`LinearSVC` wrapped in `CalibratedClassifierCV`) can be trained with `python ml/train.py --with-svm`. It is not shipped or served by default; train it against the current vectorizer and check its metrics before enabling it.
 
 ### Model Metrics (Test Split):
 
 | Model | Accuracy | Precision | Recall | F1-Score | AUC |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Logistic Regression (`lr`)** | `93.07%` | `93.09%` | `99.74%` | `96.30%` | `0.9607` |
-| **Naive Bayes (`nb`)** | `90.71%` | `90.68%` | `100.00%` | `95.11%` | `0.9209` |
-| **Linear SVM (`svm`)** | `94.95%` | `96.16%` | `98.35%` | `97.24%` | `0.9643` |
+| **Logistic Regression (`lr`)** | `92.09%` | `92.02%` | `92.15%` | `92.09%` | `0.9752` |
+| **Naive Bayes (`nb`)** | `87.84%` | `89.05%` | `86.28%` | `87.64%` | `0.9503` |
 
 ### 🛠️ How to Retrain Models
 To run the training pipeline, regenerate model metrics, recreate confusion matrix/ROC plots, and save serialized `.pkl` models:
