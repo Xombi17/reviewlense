@@ -67,15 +67,18 @@ For step-by-step guides and detailed reference manuals, please refer to the foll
 ## 🚀 Quick Start (Development Mode)
 
 ### 0. One-time backend setup
-Use Python 3.12 (see `backend/.python-version`; the pinned `numpy==1.26.4` has no wheels for 3.13+).
+Works on Python 3.12 through 3.14.
 ```bash
 cd backend
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements-vercel.txt "uvicorn[standard]" pandas==2.2.2
+pip install -r requirements-local.txt
 python -c "import nltk; [nltk.download(p) for p in ('punkt_tab', 'punkt', 'stopwords', 'wordnet')]"
+PYTHONPATH=. python -c "from ml.preprocessing import clean_review_text; print(clean_review_text('The battery is great but the mic is bad!'))"
 ```
-This installs only what the API needs. The full `requirements.txt` also adds the training and notebook tools.
+The last command should print `battery great mic bad`; if it raises a `LookupError`, the NLTK data did not download. NLTK may warn that `~/nltk_data` is group-writable. That is advisory and does not stop the download; `chmod -R go-w ~/nltk_data` silences it.
+
+`requirements-local.txt` installs only what the API needs and leaves numpy and pandas unpinned, because the exact pins in `requirements.txt` and `requirements-vercel.txt` (numpy 1.26.4, pandas 2.2.2) have no wheels for Python 3.13+. Those pinned files are for the Vercel and Docker builds. The full `requirements.txt` also adds the training and notebook tools.
 
 ### 1. Start the Backend API
 Navigate to `/backend` directory, activate virtual environment, and run:
