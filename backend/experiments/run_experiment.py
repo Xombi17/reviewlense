@@ -46,15 +46,20 @@ def _versions() -> Dict[str, str]:
     return versions
 
 
-def _hardware() -> str:
+def _hardware(uses_gpu: bool = False) -> str:
+    """Describe what the model actually ran on, not just what the machine has.
+
+    scikit-learn models run on the CPU even when the machine has a GPU, so they must not be
+    labelled with it.
+    """
     description = f"{platform.processor() or platform.machine()}, {os.cpu_count()} CPU threads"
+    if not uses_gpu:
+        return description + ", CPU only"
     try:
         import torch
 
         if torch.cuda.is_available():
-            description += f", GPU {torch.cuda.get_device_name(0)}"
-        else:
-            description += ", no GPU"
+            return description + f", GPU {torch.cuda.get_device_name(0)}"
     except ImportError:
         pass
     return description
@@ -152,7 +157,7 @@ def main(argv=None) -> str:
             "train_seconds": outcome["train_seconds"],
             "inference_seconds": outcome["inference_seconds"],
             "n_parameters": outcome["config"].get("n_parameters"),
-            "hardware": _hardware(),
+            "hardware": _hardware(uses_gpu=str(outcome["config"].get("device", "")).startswith("cuda")),
             "versions": _versions(),
         }
     arrays["y_val"], arrays["y_test"] = y_val, y_test

@@ -142,3 +142,10 @@ def test_grid_edge_is_flagged_and_wider_grid_is_honoured():
     assert _at_grid_edge(8.0, (0.5, 2.0, 8.0)) and _at_grid_edge(0.5, (0.5, 2.0, 8.0))
     assert not _at_grid_edge(2.0, (0.5, 2.0, 8.0))
     assert not _at_grid_edge(1.0, (1.0,))  # a single-value grid has no edge to hit
+
+
+def test_hardware_label_does_not_claim_a_gpu_for_cpu_models():
+    from backend.experiments.run_experiment import _hardware
+
+    assert "GPU" not in _hardware(uses_gpu=False)
+    assert _hardware(uses_gpu=False).endswith("CPU only")
