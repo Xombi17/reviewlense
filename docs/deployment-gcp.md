@@ -74,6 +74,7 @@ gcloud run services logs read reviewlens-api --region asia-south1 --limit 50
 
 - `--max-instances 2` is the real cap on spend. Budgets only send alerts and do not stop anything.
 - The service is public, so anyone can call it. CORS only restricts browsers. If traffic gets abusive, remove public access: `gcloud run services remove-iam-policy-binding reviewlens-api --region asia-south1 --member=allUsers --role=roles/run.invoker`.
+- Budget alert: `reviewlens-100inr` (₹100, about $1.10, on this project only; the billing account is in INR, so USD budgets are rejected) emails billing admins at 50%, 90% and 100%. List it with `gcloud billing budgets list --billing-account=<BILLING_ACCOUNT_ID>`.
 - Check usage: Cloud Console > Billing > Reports (filter by project), and Cloud Run > reviewlens-api > Metrics (instance time, request count).
 - Artifact Registry holds about 0.8 GB per image tag; the first 0.5 GB a month is free. Delete old tags: `gcloud artifacts docker images delete <IMG> --delete-tags`.
 
