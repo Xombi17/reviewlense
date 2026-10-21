@@ -1,0 +1,12 @@
+.venv
+venv
+__pycache__
+*.pyc
+.pytest_cache
+tests
+*.ipynb
+notebooks
+experiments/results
+experiments/saved_models
+data/raw
+data/processed_reviews.csv
