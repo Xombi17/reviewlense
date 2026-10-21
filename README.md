@@ -60,6 +60,7 @@ For step-by-step guides and detailed reference manuals, please refer to the foll
 * **[User Guide](docs/user-guide.md)**: Details on navigating the Next.js web application, analyzing reviews, uploading batch CSVs, understanding trust penalties (length, exclamation, shouting, repetition), and review examples.
 * **[Developer Setup & ML Guide](docs/developer-guide.md)**: Comprehensive guide to setting up and running backend/frontend development servers locally, dataset characteristics, NLP cleaning steps, training pipeline execution, and model failure modes.
 * **[API Reference](docs/api-reference.md)**: Full endpoint reference for `/predict`, `/batch`, and `/stats`, detailing JSON payloads, parameter schemas, and error responses.
+* **[GCP Deployment Guide](docs/deployment-gcp.md)**: Cloud Run deployment in `asia-south1` (Mumbai): the image, environment variables, build and redeploy commands, cost controls, and teardown.
 * **[Demo Video Scripts](docs/demo-scripts.md)**: Timecoded, speaker-prompted, two-part video scripts for recording end-user walkthroughs and developer setup walkthroughs.
 
 ---
@@ -105,6 +106,9 @@ pip install -r backend/requirements-transformer.txt
 TRANSFORMER_MODEL=/path/to/saved/model PYTHONPATH=. python -m uvicorn main:app --port 8000
 ```
 The model folder comes from `python -m experiments.run_experiment --save-model DIR` (see `backend/experiments/README.md`) and includes the calibration that makes its confidence meaningful. Without `TRANSFORMER_MODEL` the API serves the TF-IDF models only. Details are in `docs/api-reference.md`.
+
+### Deploying to Cloud Run
+`deploy/cloudrun/Dockerfile` builds a single-worker image with CPU-only torch for Google Cloud Run (the Railway `backend/Dockerfile` is separate and unchanged). Build it with `backend/` as the context and set `TRANSFORMER_MODEL`, `ALLOW_ORIGINS` and the other variables listed in [docs/deployment-gcp.md](docs/deployment-gcp.md), which also covers redeploys and teardown. In the frontend host, set `NEXT_PUBLIC_API_URL` to the service URL without a trailing slash and redeploy.
 
 ### 3. Run Test Suites
 Verify that everything is set up correctly by running tests:

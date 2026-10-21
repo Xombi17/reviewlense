@@ -8,6 +8,7 @@ The backend runs on Cloud Run in `asia-south1` (Mumbai), sized to stay inside th
 | Service | `reviewlens-api` |
 | URL | https://reviewlens-api-858498622871.asia-south1.run.app |
 | Image repo | `asia-south1-docker.pkg.dev/reviewlens-ai-20349/reviewlens/api` |
+| Running image | tag = the commit SHA it was built from (`gcloud run services describe reviewlens-api --region asia-south1 --format='value(spec.template.spec.containers[0].image)'`) |
 | Resources | 1 vCPU, 2Gi, concurrency 4, timeout 120 s, min instances 0, max instances 2 |
 | Access | Public (`--allow-unauthenticated`) |
 
@@ -44,10 +45,10 @@ gcloud auth configure-docker asia-south1-docker.pkg.dev
 
 ## Build, push, deploy (also how to redeploy)
 
-Use a new tag per release (`v2`, `v3`, ...).
+Build from an up-to-date `main` with a clean working tree and tag the image with the commit SHA, so the running image can be traced to a commit. The transformer folder `backend/models/transformer-200k` is gitignored and must be present locally.
 
 ```bash
-IMG=asia-south1-docker.pkg.dev/reviewlens-ai-20349/reviewlens/api:v2
+IMG=asia-south1-docker.pkg.dev/reviewlens-ai-20349/reviewlens/api:$(git rev-parse --short HEAD)
 docker build -f deploy/cloudrun/Dockerfile -t $IMG backend
 docker push $IMG
 
