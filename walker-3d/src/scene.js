@@ -69,21 +69,34 @@ export function createStage(container) {
   ground.name = 'Ground';
   scene.add(ground);
 
+  // `left` and `bottom` keep the model clear of UI that sits over the canvas; null means the default for this width.
+  const layout = { fov: null, left: null, bottom: 0 };
+
+  function applyView() {
+    const { clientWidth: width, clientHeight: height } = container;
+    camera.aspect = width / height;
+    // Keep the whole walker in frame on portrait screens.
+    camera.fov = layout.fov ?? (camera.aspect < 1 ? 46 : 32);
+    const left = layout.left ?? getViewInset(width);
+    if (left > 0 || layout.bottom > 0) camera.setViewOffset(width, height, -left / 2, layout.bottom / 2, width, height);
+    else camera.clearViewOffset();
+    camera.updateProjectionMatrix();
+  }
+
   function resize() {
     const { clientWidth: width, clientHeight: height } = container;
     renderer.setSize(width, height);
     labelRenderer.setSize(width, height);
-    camera.aspect = width / height;
-    // Keep the whole walker in frame on portrait screens.
-    camera.fov = camera.aspect < 1 ? 46 : 32;
-    const inset = getViewInset(width);
-    if (inset > 0) camera.setViewOffset(width, height, -inset / 2, 0, width, height); // centre in the free area
-    else camera.clearViewOffset();
-    camera.updateProjectionMatrix();
+    applyView();
   }
   window.addEventListener('resize', resize);
   resize();
   controls.update();
 
-  return { renderer, labelRenderer, scene, camera, controls };
+  function setLayout(next) {
+    Object.assign(layout, next);
+    applyView();
+  }
+
+  return { renderer, labelRenderer, scene, camera, controls, setLayout };
 }

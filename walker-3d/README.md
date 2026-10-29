@@ -29,6 +29,9 @@ Other scripts: `npm run build` (production bundle in `dist/`) and `npm run previ
 | Front / Side / 3/4 / Top | Smooth camera tween, framed to the viewport size. Dragging the model cancels the tween. |
 | Export GLB | Downloads the walker in its current pose with `GLTFExporter` (helper objects such as contact shadows and anchors are left out). |
 | Auto-rotate | Slow turntable for presentations. |
+| Start walkthrough | Guided tour of the five steps on the product sheet: standing up from a chair, walking, turning, resting on the panel, folding. A mannequin uses the walker; Back, Next, Pause, the numbered dots, the arrow keys and Esc all work. |
+| Redesigned / Existing / Compare | Switches between the redesigned walker, the walker it replaces, and a draggable wipe (existing on the left, redesigned on the right) with the sheet's problem and benefit lists. |
+| User and fit | Enter a height from 140 to 200 cm. The mannequin stands at the walker and the elbow bend at the grips is measured live: 15° to 35° is a good fit. "Fit handle to this height" sets the handle to about half of standing height. The existing walker's fixed handle shows where it stops fitting. |
 
 Orbit with the mouse or touch (drag, scroll or pinch).
 
@@ -55,6 +58,13 @@ src/
   panel.js        createPanel(): padded RoundedBox, orange hinge, fold/unfold pivot
   foot.js         createFoot(): LatheGeometry rubber foot with an orange ring
   controls.js     the DOM control panel
+  walkthrough.js  the five guided steps and their caption card
+  mannequin.js    art mannequin with two-bone IK for arms and legs
+  poses.js        standing pose shared by the tour and the fit check
+  ergonomics.js   recommended handle height and the fit rating
+  existing.js     the fixed-height walker being replaced
+  compare.js      wipe divider and the before/after lists
+  props.js        chair and floor ticks for the tour
   annotations.js  CSS2D labels and leader lines
   cameraRig.js    camera presets and tween
   exporter.js     GLB export

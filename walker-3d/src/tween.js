@@ -14,6 +14,10 @@ export class Tweener {
     });
   }
 
+  clear() {
+    this.active = [];
+  }
+
   update(delta) {
     for (const tween of this.active) {
       tween.elapsed += delta;

@@ -1,4 +1,5 @@
 import { DIM } from './constants.js';
+import { STATURE_RANGE } from './ergonomics.js';
 
 const toggleRow = (id, label, stateId, initial) => `
   <label class="switch">
@@ -14,6 +15,7 @@ const toggleRow = (id, label, stateId, initial) => `
 export function createControls(container, initial, actions) {
   const [minHeight, maxHeight] = DIM.heightRange;
   const [minAngle, maxAngle] = DIM.angleRange;
+  const [minStature, maxStature] = STATURE_RANGE;
 
   const panel = document.createElement('aside');
   panel.className = 'control-panel';
@@ -27,8 +29,17 @@ export function createControls(container, initial, actions) {
       <button type="button" class="collapse" aria-expanded="true" aria-label="Collapse controls">–</button>
     </header>
     <div class="panel-body">
-      <section>
-        <h2>Handle</h2>
+      <button type="button" class="button tour" id="tour-button"><span aria-hidden="true">&#9654;</span> Start walkthrough</button>
+
+      <div class="segmented" role="radiogroup" aria-label="Model to show">
+        <label><input type="radio" name="mode" value="redesigned" checked /><span>Redesigned</span></label>
+        <label><input type="radio" name="mode" value="existing" /><span>Existing</span></label>
+        <label><input type="radio" name="mode" value="compare" /><span>Compare</span></label>
+      </div>
+      <p class="mode-note" id="mode-note" hidden>Switch to Redesigned to use the handle and mechanism controls.</p>
+
+      <details class="group redesigned-only" open>
+        <summary>Handle</summary>
         <label class="slider">
           <span>Height</span><output id="height-out"></output>
           <input type="range" id="height" min="${minHeight}" max="${maxHeight}" step="0.005" value="${initial.handleHeight}" />
@@ -37,18 +48,36 @@ export function createControls(container, initial, actions) {
           <span>Angle</span><output id="angle-out"></output>
           <input type="range" id="angle" min="${minAngle}" max="${maxAngle}" step="1" value="${initial.handleAngle}" />
         </label>
-      </section>
-      <section>
-        <h2>Mechanisms</h2>
+      </details>
+
+      <details class="group redesigned-only" open>
+        <summary>Mechanisms</summary>
         ${toggleRow('panel-toggle', 'Rest panel', 'panel-state', initial.panelOpen > 0.5)}
         <div class="lock-row">
           ${toggleRow('lock-toggle', 'Lock lever', 'lock-state', initial.lock > 0.5)}
           <i class="led" id="lock-led" aria-hidden="true"></i>
         </div>
         <button type="button" class="button" id="fold-button">Fold for storage</button>
-      </section>
-      <section>
-        <h2>View</h2>
+      </details>
+
+      <details class="group" open>
+        <summary>User and fit</summary>
+        <div class="stature">
+          <label for="stature">Height</label>
+          <span class="stature-input"><input type="number" id="stature" min="${minStature}" max="${maxStature}" step="1" value="170" inputmode="numeric" /> cm</span>
+          <input type="range" id="stature-range" min="${minStature}" max="${maxStature}" step="1" value="170" aria-label="User height" />
+        </div>
+        ${toggleRow('user-toggle', 'Show user', 'user-state', false)}
+        <button type="button" class="button" id="fit-button">Fit handle to this height</button>
+        <div class="fit" id="fit" data-tone="good" aria-live="polite">
+          <span class="chip" id="fit-chip">Good fit</span>
+          <span class="fit-detail" id="fit-detail"></span>
+          <span class="fit-rec">Recommended handle height <b id="fit-rec"></b></span>
+        </div>
+      </details>
+
+      <details class="group">
+        <summary>View</summary>
         ${toggleRow('notes-toggle', 'Annotations', 'notes-state', false)}
         ${toggleRow('rotate-toggle', 'Auto-rotate', 'rotate-state', false)}
         <div class="presets" role="group" aria-label="Camera presets">
@@ -57,7 +86,8 @@ export function createControls(container, initial, actions) {
           <button type="button" class="button small" data-view="threeQuarter">3/4</button>
           <button type="button" class="button small" data-view="top">Top</button>
         </div>
-      </section>
+      </details>
+
       <button type="button" class="button primary" id="export-button">Export GLB</button>
       <p class="status" id="status" role="status"></p>
     </div>`;
@@ -69,6 +99,9 @@ export function createControls(container, initial, actions) {
   const panelToggle = $('#panel-toggle');
   const lockToggle = $('#lock-toggle');
   const foldButton = $('#fold-button');
+  const statureNumber = $('#stature');
+  const statureRange = $('#stature-range');
+  const userToggle = $('#user-toggle');
 
   const setText = (id, text) => ($(id).textContent = text);
   const showHeight = (value) => setText('#height-out', `${Number(value).toFixed(2)} m`);
@@ -80,6 +113,7 @@ export function createControls(container, initial, actions) {
   };
   const showNotes = (on) => setText('#notes-state', on ? '· on' : '· off');
   const showRotate = (on) => setText('#rotate-state', on ? '· on' : '· off');
+  const showUser = (on) => setText('#user-state', on ? '· on' : '· off');
   const showFold = (folded) => {
     foldButton.textContent = folded ? 'Unfold walker' : 'Fold for storage';
     foldButton.classList.toggle('active', folded);
@@ -92,6 +126,7 @@ export function createControls(container, initial, actions) {
   showLock(initial.lock > 0.5);
   showNotes(false);
   showRotate(false);
+  showUser(false);
   showFold(false);
 
   heightInput.addEventListener('input', () => {
@@ -122,6 +157,30 @@ export function createControls(container, initial, actions) {
   panel.querySelectorAll('[data-view]').forEach((button) => {
     button.addEventListener('click', () => actions.goToView(button.dataset.view));
   });
+
+  // Mode, user and walkthrough.
+  panel.querySelectorAll('input[name=mode]').forEach((radio) => {
+    radio.addEventListener('change', () => actions.setMode(radio.value));
+  });
+  $('#tour-button').addEventListener('click', () => actions.startWalkthrough());
+
+  const applyStature = (value) => {
+    const clamped = Math.min(maxStature, Math.max(minStature, Math.round(value)));
+    statureNumber.value = clamped;
+    statureRange.value = clamped;
+    actions.setStature(clamped);
+  };
+  statureRange.addEventListener('input', () => applyStature(Number(statureRange.value)));
+  statureNumber.addEventListener('change', () => {
+    if (statureNumber.value !== '' && Number.isFinite(Number(statureNumber.value))) applyStature(Number(statureNumber.value));
+    else statureNumber.value = statureRange.value;
+  });
+  userToggle.addEventListener('change', () => {
+    showUser(userToggle.checked);
+    actions.setShowUser(userToggle.checked);
+  });
+  $('#fit-button').addEventListener('click', () => actions.fitHandle());
+
   const exportButton = $('#export-button');
   exportButton.addEventListener('click', async () => {
     exportButton.disabled = true;
@@ -148,6 +207,36 @@ export function createControls(container, initial, actions) {
       showPanel(open);
     },
     setFolded: showFold,
+    setHandleHeight(value) {
+      heightInput.value = value;
+      showHeight(value);
+    },
+    setMode(mode) {
+      panel.querySelector(`input[name=mode][value=${mode}]`).checked = true;
+      const redesigned = mode === 'redesigned';
+      $('#fit-button').disabled = !redesigned;
+      panel.querySelectorAll('.redesigned-only').forEach((group) => {
+        group.inert = !redesigned;
+        group.classList.toggle('dimmed', !redesigned);
+      });
+      $('#mode-note').hidden = redesigned;
+    },
+    setShowUser(on) {
+      userToggle.checked = on;
+      showUser(on);
+    },
+    setUserToggleEnabled(enabled) {
+      userToggle.disabled = !enabled;
+    },
+    setFit(assessment, recommended) {
+      $('#fit').dataset.tone = assessment.tone;
+      setText('#fit-chip', assessment.label);
+      setText('#fit-detail', assessment.detail);
+      setText('#fit-rec', `${recommended.toFixed(2)} m`);
+    },
+    setWalkthroughActive(active) {
+      panel.hidden = active;
+    },
     setStatus(text) {
       $('#status').textContent = text;
     },

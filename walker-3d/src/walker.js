@@ -44,5 +44,6 @@ export function createWalker() {
       heightLock: left.userData.anchors.heightLock,
       feet: left.userData.anchors.foot,
     },
+    grips: { left: left.userData.anchors.grip, right: right.userData.anchors.grip },
   };
 }
